@@ -1,0 +1,1137 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบทะเบียนบุคลากร - สถาบันบำราศนราดูร</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Sarabun', sans-serif; }
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .form-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+        }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        .form-input:focus {
+            outline: none;
+            border-color: #f8b4cb;
+            box-shadow: 0 0 0 3px rgba(248, 180, 203, 0.2);
+            background: rgba(255, 255, 255, 1);
+        }
+        .section-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-bounce { animation: bounce 2s infinite; }
+        .animate-pulse { animation: pulse 2s infinite; }
+        .animate-rotate { animation: rotate 3s linear infinite; }
+        .animate-float { animation: float 3s ease-in-out infinite; }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: linear-gradient(135deg, #fef7ff 0%, #f3e8ff 100%);
+            margin: 2% auto;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+        @media (max-width: 768px) {
+            .form-section {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            .modal-content {
+                margin: 5% auto;
+                padding: 1rem;
+                width: 95%;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100">
+
+    <!-- Header -->
+    <header class="glass-effect p-4 mb-8">
+        <div class="container mx-auto flex items-center justify-center">
+            <div class="flex items-center space-x-4">
+                <i class="fas fa-hospital text-blue-600 text-3xl"></i>
+                <div>
+                    <h1 class="text-blue-900 text-xl font-bold">ระบบทะเบียนบุคลากร</h1>
+                    <p class="text-blue-800 text-sm">สถาบันบำราศนราดูร</p>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container mx-auto px-4">
+        <!-- Registration Form -->
+        <div id="registrationForm" class="fade-in">
+            <div class="max-w-6xl mx-auto px-4">
+                <form id="staffForm">
+                    <!-- ข้อมูลส่วนตัว -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-user text-pink-500 animate-bounce"></i>ข้อมูลส่วนตัว
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-id-card text-blue-500 mr-2"></i>เลขที่บัตรประจำตัวประชาชน *</label>
+                                <input type="text" name="idCard" required class="form-input" maxlength="13" placeholder="1234567890123">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-user-tag text-purple-500 mr-2"></i>คำนำหน้า *</label>
+                                <select name="prefix" required class="form-input">
+                                    <option value="">เลือกคำนำหน้า</option>
+                                    <option value="นาย">นาย</option>
+                                    <option value="นาง">นาง</option>
+                                    <option value="นางสาว">นางสาว</option>
+                                    <option value="อื่นๆ">อื่นๆ</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-signature text-pink-500 mr-2"></i>ชื่อ - นามสกุล *</label>
+                                <input type="text" name="fullName" required class="form-input" placeholder="ชื่อ นามสกุล">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-birthday-cake text-orange-500 mr-2"></i>วันเดือนปีเกิด *</label>
+                                <input type="date" name="birthDate" required class="form-input" onchange="calculateAge()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-phone text-green-500 mr-2"></i>หมายเลขโทรศัพท์</label>
+                                <input type="tel" name="phone" class="form-input" placeholder="08xxxxxxxx" maxlength="10">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-envelope text-red-500 mr-2"></i>อีเมลล์</label>
+                                <input type="email" name="email" class="form-input" placeholder="example@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-calendar-alt text-indigo-500 mr-2"></i>อายุ</label>
+                                <input type="number" name="age" class="form-input bg-gray-100" readonly placeholder="คำนวณอัตโนมัติ">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-hourglass-end text-amber-500 mr-2"></i>ปีที่เกษียณอายุราชการ</label>
+                                <input type="number" name="retirementYear" class="form-input bg-gray-100" readonly placeholder="คำนวณอัตโนมัติ">
+                            </div>
+                        </div>
+                        <div class="form-group mt-4">
+                            <label class="form-label"><i class="fas fa-camera text-cyan-500 mr-2"></i>รูปภาพประจำตัว</label>
+                            <input type="file" name="personalImage" accept="image/*" class="form-input" onchange="previewImage(this, 'personalImagePreview', 'personalImageStatus')">
+                            <div id="personalImagePreview" class="mt-2"></div>
+                            <div id="personalImageStatus" class="mt-1 text-sm text-gray-600"></div>
+                        </div>
+                    </div>
+
+                    <!-- ข้อมูลตำแหน่งงาน -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-briefcase text-purple-600 animate-pulse"></i>ข้อมูลตำแหน่งงาน
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-building text-blue-600 mr-2"></i>หน่วยงานที่ปฏิบัติงานปัจจุบัน</label>
+                                <select name="department" class="form-input">
+                                    <option value="">เลือกหน่วยงาน</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-user-tie text-indigo-600 mr-2"></i>ตำแหน่ง</label>
+                                <select name="position" class="form-input">
+                                    <option value="">เลือกตำแหน่ง</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-hashtag text-purple-600 mr-2"></i>เลขที่ประจำตำแหน่ง</label>
+                                <input type="text" name="positionNumber" class="form-input" placeholder="เลขที่ตำแหน่ง">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-layer-group text-teal-600 mr-2"></i>ระดับของตำแหน่ง</label>
+                                <select name="positionLevel" class="form-input">
+                                    <option value="">เลือกระดับตำแหน่ง</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-tags text-emerald-600 mr-2"></i>ประเภทของตำแหน่ง</label>
+                                <select name="positionType" class="form-input">
+                                    <option value="">เลือกประเภทตำแหน่ง</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-star text-yellow-600 mr-2"></i>ด้านความชำนาญของตำแหน่ง</label>
+                                <select name="expertise" class="form-input">
+                                    <option value="">เลือกด้านความชำนาญ</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ข้อมูลวิชาชีพ -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-certificate text-emerald-500 animate-rotate"></i>ข้อมูลวิชาชีพ
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-id-badge text-blue-500 mr-2"></i>เลขที่ใบประกอบวิชาชีพ</label>
+                                <input type="text" name="licenseNumber" class="form-input" placeholder="เลขที่ใบประกอบวิชาชีพ">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-user-nurse text-pink-500 mr-2"></i>เลขที่สมาชิกสภาการพยาบาล</label>
+                                <input type="text" name="nursingCouncilNumber" class="form-input" placeholder="เลขที่สมาชิก">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-calendar-times text-red-500 mr-2"></i>วันหมดอายุใบประกอบวิชาชีพ</label>
+                                <input type="date" name="licenseExpiry" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-play-circle text-green-500 mr-2"></i>วันที่เริ่มปฏิบัติงาน</label>
+                                <input type="date" name="startDate" class="form-input" onchange="calculateWorkExperience()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-clock text-orange-500 mr-2"></i>อายุงาน</label>
+                                <input type="text" name="workExperience" class="form-input bg-gray-100" readonly placeholder="คำนวณอัตโนมัติ">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-calendar-check text-purple-500 mr-2"></i>วันที่บรรจุราชการ</label>
+                                <input type="date" name="appointmentDate" class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-medal text-yellow-500 mr-2"></i>วันที่ดำรงตำแหน่ง พยาบาลวิชาชีพชำนาญการ</label>
+                                <input type="date" name="specialistDate" class="form-input">
+                            </div>
+                        </div>
+                        <div class="form-group mt-4">
+                            <label class="form-label"><i class="fas fa-file-medical text-teal-500 mr-2"></i>แนบเอกสารใบประกอบวิชาชีพ</label>
+                            <input type="file" name="licenseDocument" accept="image/*,.pdf" class="form-input" onchange="previewImage(this, 'licenseDocumentPreview', 'licenseDocumentStatus')">
+                            <div id="licenseDocumentPreview" class="mt-2"></div>
+                            <div id="licenseDocumentStatus" class="mt-1 text-sm text-gray-600"></div>
+                        </div>
+                        <!-- Hidden staff photo field - uses same as personal image -->
+                        <input type="hidden" name="staffPhoto" value="">
+                    </div>
+
+                    <!-- ข้อมูลการศึกษา -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-graduation-cap text-indigo-600 animate-float"></i>ข้อมูลการศึกษา
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-university text-blue-600 mr-2"></i>ระดับการศึกษาสูงสุด</label>
+                                <select name="educationLevel" class="form-input">
+                                    <option value="">เลือกระดับการศึกษา</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-graduation-cap text-green-600 mr-2"></i>วุฒิปริญญาตรี สาขา</label>
+                                <input type="text" name="bachelorField" class="form-input" placeholder="สาขาวิชา">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-user-graduate text-purple-600 mr-2"></i>วุฒิปริญญาโท สาขา</label>
+                                <input type="text" name="masterField" class="form-input" placeholder="สาขาวิชา">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-crown text-yellow-600 mr-2"></i>วุฒิปริญญาเอก สาขา</label>
+                                <input type="text" name="doctoralField" class="form-input" placeholder="สาขาวิชา">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-stethoscope text-pink-600 mr-2"></i>หลักสูตรการพยาบาลเฉพาะทางสาขา</label>
+                            <input type="text" name="specializedNursing" class="form-input" placeholder="สาขาการพยาบาลเฉพาะทาง">
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-scroll text-indigo-500 mr-2"></i>แนบเอกสารใบสำเร็จการศึกษา</label>
+                                <input type="file" name="educationDocument" accept="image/*,.pdf" class="form-input" onchange="previewImage(this, 'educationDocumentPreview', 'educationDocumentStatus')">
+                                <div id="educationDocumentPreview" class="mt-2"></div>
+                                <div id="educationDocumentStatus" class="mt-1 text-sm text-gray-600"></div>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label"><i class="fas fa-certificate text-amber-500 mr-2"></i>แนบเอกสารวุฒิบัตร</label>
+                                <input type="file" name="specializedDocument" accept="image/*,.pdf" class="form-input" onchange="previewImage(this, 'specializedDocumentPreview', 'specializedDocumentStatus')">
+                                <div id="specializedDocumentPreview" class="mt-2"></div>
+                                <div id="specializedDocumentStatus" class="mt-1 text-sm text-gray-600"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ข้อมูลเพิ่มเติม -->
+                    <div class="form-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-info-circle text-orange-500 animate-pulse"></i>ข้อมูลเพิ่มเติม
+                        </h3>
+                        <div class="form-group">
+                            <label class="form-label"><i class="fas fa-clipboard-list text-teal-600 mr-2"></i>ประเภทการเข้า/ออกปฏิบัติการในสถาบันบำราศนราดูร</label>
+                            <input type="text" name="workType" class="form-input" placeholder="กรอกประเภทการปฏิบัติงาน">
+                        </div>
+                    </div>
+
+                    <!-- ปุ่มบันทึก -->
+                    <div class="form-section">
+                        <div class="flex gap-4">
+                            <button type="submit" class="flex-1 bg-gradient-to-r from-pink-300 to-purple-300 hover:from-pink-400 hover:to-purple-400 text-black font-semibold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center text-lg shadow-lg">
+                                <i class="fas fa-save mr-3 animate-bounce text-yellow-600"></i>บันทึกข้อมูล
+                            </button>
+                            <button type="button" id="clearFormBtn" onclick="clearForm()" class="flex-1 bg-gradient-to-r from-gray-300 to-gray-400 hover:from-gray-400 hover:to-gray-500 text-black font-semibold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center text-lg shadow-lg" style="display: none;">
+                                <i class="fas fa-broom mr-3 text-blue-600"></i>ล้างข้อมูล
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Data Details Modal -->
+        <div id="dataModal" class="modal">
+            <div class="modal-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-user-check text-emerald-500 mr-3 animate-bounce"></i>
+                        ข้อมูลที่บันทึกเรียบร้อยแล้ว
+                    </h2>
+                    <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div id="modalContent" class="space-y-4">
+                    <!-- Content will be populated by JavaScript -->
+                </div>
+                <div class="flex gap-4 mt-6">
+                    <button onclick="editData()" class="flex-1 bg-gradient-to-r from-blue-300 to-indigo-300 hover:from-blue-400 hover:to-indigo-400 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center">
+                        <i class="fas fa-edit mr-2 animate-pulse text-yellow-300"></i>แก้ไขข้อมูล
+                    </button>
+                    <button onclick="closeModal()" class="flex-1 bg-gradient-to-r from-gray-300 to-gray-400 hover:from-gray-400 hover:to-gray-500 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center">
+                        <i class="fas fa-check mr-2 text-green-400"></i>ปิด
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyyOMbDhvb0cCpuI2tS5tLbZ54JwhK6H6nhW83IddLPBhS_4FnbhINEK69IhKbyfQE57A/exec';
+        const SHEET_ID = '1COt-ehxsy2b8B7zomUozR9Qpuo6j09rsGKSlaGABQro';
+        const SHEET_NAME = 'ชีต1';
+        const FOLDER_ID = '1TUm9g7DgHvy9sRsjuya-gK3D1TjqPgm_';
+        
+        let dropdownData = {
+            departments: [],
+            positions: [],
+            positionLevels: [],
+            positionTypes: [],
+            positionExpertise: [],
+            education: [],
+            workTypes: []
+        };
+
+        // Auto-calculation functions
+        function calculateAge() {
+            const birthDateInput = document.querySelector('input[name="birthDate"]');
+            const ageInput = document.querySelector('input[name="age"]');
+            const retirementYearInput = document.querySelector('input[name="retirementYear"]');
+            
+            if (birthDateInput.value) {
+                const birthDate = new Date(birthDateInput.value);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
+                }
+                
+                ageInput.value = age;
+                
+                // Calculate retirement year (birth year + 60)
+                const retirementYear = birthDate.getFullYear() + 60;
+                retirementYearInput.value = retirementYear;
+            }
+        }
+
+        function calculateWorkExperience() {
+            const startDateInput = document.querySelector('input[name="startDate"]');
+            const workExperienceInput = document.querySelector('input[name="workExperience"]');
+            
+            if (startDateInput.value) {
+                const startDate = new Date(startDateInput.value);
+                const today = new Date();
+                
+                let years = today.getFullYear() - startDate.getFullYear();
+                let months = today.getMonth() - startDate.getMonth();
+                
+                if (months < 0) {
+                    years--;
+                    months += 12;
+                }
+                
+                if (today.getDate() < startDate.getDate()) {
+                    months--;
+                    if (months < 0) {
+                        years--;
+                        months += 12;
+                    }
+                }
+                
+                let experienceText = '';
+                if (years > 0) {
+                    experienceText += years + ' ปี';
+                }
+                if (months > 0) {
+                    if (experienceText) experienceText += ' ';
+                    experienceText += months + ' เดือน';
+                }
+                if (!experienceText) {
+                    experienceText = 'น้อยกว่า 1 เดือน';
+                }
+                
+                workExperienceInput.value = experienceText;
+            }
+        }
+
+        // Image compression functions
+        function compressImage(file, maxWidth = 800, maxHeight = 600, quality = 0.8) {
+            return new Promise((resolve) => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                img.onload = function() {
+                    // Calculate new dimensions
+                    let { width, height } = img;
+                    
+                    if (width > height) {
+                        if (width > maxWidth) {
+                            height = (height * maxWidth) / width;
+                            width = maxWidth;
+                        }
+                    } else {
+                        if (height > maxHeight) {
+                            width = (width * maxHeight) / height;
+                            height = maxHeight;
+                        }
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    // Draw and compress
+                    ctx.drawImage(img, 0, 0, width, height);
+                    canvas.toBlob(resolve, 'image/jpeg', quality);
+                };
+                
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function getFileSizeStatus(size) {
+            if (size < 500000) return { color: '🟢', text: 'ไฟล์ขนาดเหมาะสม' };
+            if (size < 1000000) return { color: '🟡', text: 'ไฟล์ปานกลาง - อาจบีบอัดเล็กน้อย' };
+            return { color: '🔴', text: 'ไฟล์ใหญ่ - จะบีบอัดอัตโนมัติ' };
+        }
+
+        // Load dropdown data
+        async function loadDropdownData() {
+            try {
+                const response = await fetch(SCRIPT_URL + '?action=getDropdownData');
+                const data = await response.json();
+                
+                if (data.success) {
+                    dropdownData = data.data;
+                    populateDropdowns();
+                }
+            } catch (error) {
+                console.error('Error loading dropdown data:', error);
+                // Load with fallback data if API fails
+                populateDropdowns();
+            }
+        }
+
+        function populateDropdowns() {
+            // Populate department dropdown from column D data
+            const departmentSelect = document.querySelector('select[name="department"]');
+            if (departmentSelect) {
+                departmentSelect.innerHTML = '<option value="">เลือกหน่วยงาน</option>';
+                
+                // Use data from column D if available
+                if (dropdownData.departments && dropdownData.departments.length > 0) {
+                    const uniqueDepartments = [...new Set(dropdownData.departments.filter(dept => dept))];
+                    uniqueDepartments.forEach(dept => {
+                        departmentSelect.innerHTML += `<option value="${dept}">${dept}</option>`;
+                    });
+                }
+            }
+
+            // Populate position dropdown from column H data
+            const positionSelect = document.querySelector('select[name="position"]');
+            if (positionSelect) {
+                positionSelect.innerHTML = '<option value="">เลือกตำแหน่ง</option>';
+                if (dropdownData.positions && dropdownData.positions.length > 0) {
+                    const uniquePositions = [...new Set(dropdownData.positions.filter(pos => pos))];
+                    uniquePositions.forEach(pos => {
+                        positionSelect.innerHTML += `<option value="${pos}">${pos}</option>`;
+                    });
+                }
+            }
+
+            // Populate position level dropdown from column I data + ระดับเชี่ยวชาญ (exclude ชำนาญการพิเศษ, ผู้ช่วยพยาบาล)
+            const positionLevelSelect = document.querySelector('select[name="positionLevel"]');
+            if (positionLevelSelect) {
+                positionLevelSelect.innerHTML = '<option value="">เลือกระดับตำแหน่ง</option>';
+                if (dropdownData.positionLevels && dropdownData.positionLevels.length > 0) {
+                    const filteredLevels = dropdownData.positionLevels.filter(level => 
+                        level && 
+                        level !== 'ชำนาญการพิเศษ' && 
+                        level !== 'ผู้ช่วยพยาบาล'
+                    );
+                    const uniqueLevels = [...new Set(filteredLevels)];
+                    uniqueLevels.forEach(level => {
+                        positionLevelSelect.innerHTML += `<option value="${level}">${level}</option>`;
+                    });
+                }
+                // Add ระดับเชี่ยวชาญ option
+                positionLevelSelect.innerHTML += `<option value="ระดับเชี่ยวชาญ">ระดับเชี่ยวชาญ</option>`;
+            }
+
+            // Populate position type dropdown from column J data (exclude ผู้ช่วยพยาบาล)
+            const positionTypeSelect = document.querySelector('select[name="positionType"]');
+            if (positionTypeSelect) {
+                positionTypeSelect.innerHTML = '<option value="">เลือกประเภทตำแหน่ง</option>';
+                if (dropdownData.positionTypes && dropdownData.positionTypes.length > 0) {
+                    const filteredTypes = dropdownData.positionTypes.filter(type => 
+                        type && type !== 'ผู้ช่วยพยาบาล'
+                    );
+                    const uniqueTypes = [...new Set(filteredTypes)];
+                    uniqueTypes.forEach(type => {
+                        positionTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
+                    });
+                }
+            }
+
+            // Populate expertise dropdown from column K data (exclude อบัติเหตุและฉุกเฉิน)
+            const expertiseSelect = document.querySelector('select[name="expertise"]');
+            if (expertiseSelect) {
+                expertiseSelect.innerHTML = '<option value="">เลือกด้านความชำนาญ</option>';
+                if (dropdownData.positionExpertise && dropdownData.positionExpertise.length > 0) {
+                    const filteredExpertise = dropdownData.positionExpertise.filter(exp => 
+                        exp && exp !== 'อบัติเหตุและฉุกเฉิน'
+                    );
+                    const uniqueExpertise = [...new Set(filteredExpertise)];
+                    uniqueExpertise.forEach(exp => {
+                        expertiseSelect.innerHTML += `<option value="${exp}">${exp}</option>`;
+                    });
+                }
+            }
+
+            // Populate education level dropdown from column V data
+            const educationSelect = document.querySelector('select[name="educationLevel"]');
+            if (educationSelect) {
+                educationSelect.innerHTML = '<option value="">เลือกระดับการศึกษา</option>';
+                if (dropdownData.education && dropdownData.education.length > 0) {
+                    const uniqueEducation = [...new Set(dropdownData.education.filter(edu => edu))];
+                    uniqueEducation.forEach(edu => {
+                        educationSelect.innerHTML += `<option value="${edu}">${edu}</option>`;
+                    });
+                }
+            }
+
+            // Populate work type dropdown from column AE data
+            const workTypeSelect = document.querySelector('select[name="workType"]');
+            if (workTypeSelect) {
+                workTypeSelect.innerHTML = '<option value="">เลือกประเภท</option>';
+                if (dropdownData.workTypes && dropdownData.workTypes.length > 0) {
+                    const uniqueWorkTypes = [...new Set(dropdownData.workTypes.filter(type => type))];
+                    uniqueWorkTypes.forEach(type => {
+                        workTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
+                    });
+                }
+            }
+        }
+
+        // Handle image upload - returns base64 data URL for GS processing
+        async function handleImageUpload(file) {
+            if (!file) return '';
+            
+            const originalSize = file.size;
+            let compressedFile = file;
+            let compressionInfo = '';
+            
+            // First compression: 800x600, 80% quality
+            if (file.size > 500000) {
+                compressedFile = await compressImage(file, 800, 600, 0.8);
+                
+                // Second compression if still too large: 600x450, 60% quality
+                if (compressedFile.size > 1000000) {
+                    compressedFile = await compressImage(file, 600, 450, 0.6);
+                }
+                
+                const reduction = ((originalSize - compressedFile.size) / originalSize * 100).toFixed(1);
+                compressionInfo = `บีบอัดแล้ว ${reduction}% (${formatFileSize(originalSize)} → ${formatFileSize(compressedFile.size)})`;
+            }
+            
+            // Convert to base64 data URL (keep the data:image prefix for GS)
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    resolve(e.target.result); // Return full data URL with prefix
+                };
+                reader.readAsDataURL(compressedFile);
+            });
+        }
+
+        // Form submission with timeout handling
+        document.getElementById('staffForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Check if in update mode
+            const isUpdate = window.isUpdateMode || false;
+            
+            // Show loading with SweetAlert2
+            const loadingAlert = Swal.fire({
+                title: isUpdate ? 'กำลังอัพเดทข้อมูล...' : 'กำลังบันทึกข้อมูล...',
+                html: 'กรุณารอสักครู่',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            const formData = new FormData(this);
+            const data = {};
+            
+            try {
+                // Handle multiple image uploads
+                const imageFields = ['personalImage', 'licenseDocument', 'educationDocument', 'specializedDocument'];
+                
+                for (const fieldName of imageFields) {
+                    const imageFile = formData.get(fieldName);
+                    if (imageFile && imageFile.size > 0) {
+                        const imageData = await handleImageUpload(imageFile);
+                        data[fieldName] = imageData;
+                    } else {
+                        data[fieldName] = '';
+                    }
+                }
+                
+                // Use personal image for staff photo as well
+                data.staffPhoto = data.personalImage;
+                
+                // Map form fields to Google Sheets columns according to GS code
+                data.idCard = formData.get('idCard');
+                data.department = formData.get('department');
+                data.positionId = formData.get('positionNumber');
+                data.prefix = formData.get('prefix');
+                data.fullName = formData.get('fullName');
+                data.position = formData.get('position');
+                data.positionLevel = formData.get('positionLevel');
+                data.positionType = formData.get('positionType');
+                data.positionExpertise = formData.get('expertise');
+                data.birthDate = formData.get('birthDate');
+                data.licenseNumber = formData.get('licenseNumber');
+                data.nursingCouncilNumber = formData.get('nursingCouncilNumber');
+                data.licenseExpiry = formData.get('licenseExpiry');
+                data.startWorkDate = formData.get('startDate');
+                data.appointmentDate = formData.get('appointmentDate');
+                data.specialistDate = formData.get('specialistDate');
+                data.retirementYear = formData.get('retirementYear');
+                data.phone = formData.get('phone');
+                data.email = formData.get('email');
+                data.education = formData.get('educationLevel');
+                data.bachelorDegree = formData.get('bachelorField');
+                data.masterDegree = formData.get('masterField');
+                data.doctoralDegree = formData.get('doctoralField');
+                data.specializedNursing = formData.get('specializedNursing');
+                data.workType = formData.get('workType');
+                data.age = formData.get('age');
+                data.workAge = formData.get('workExperience');
+                data.licenseExpiryDate = formData.get('licenseExpiry');
+
+                // Set timeout for the entire operation
+                const timeoutPromise = new Promise((_, reject) => {
+                    setTimeout(() => reject(new Error('Timeout')), 30000); // 30 second timeout
+                });
+
+                // Try to send data with timeout
+                const sendDataPromise = isUpdate ? updateData(data) : sendDataToGoogleSheets(data);
+                
+                await Promise.race([sendDataPromise, timeoutPromise]);
+                
+                // Close loading alert
+                Swal.close();
+                
+                // Store data for editing
+                window.currentData = data;
+                
+                // Mark that we have submitted before (for tracking updates)
+                window.hasSubmittedBefore = true;
+                
+                // Determine if this was an update or create based on the actual operation
+                const wasUpdate = window.hasSubmittedBefore;
+                
+                if (wasUpdate) {
+                    // Show success message for update
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'อัพเดทข้อมูลเรียบร้อย!',
+                        confirmButtonText: 'ตกลง',
+                        confirmButtonColor: '#10b981'
+                    });
+                } else {
+                    // Show success message for new record
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'บันทึกข้อมูลเรียบร้อย!',
+                        confirmButtonText: 'ตกลง',
+                        confirmButtonColor: '#10b981'
+                    });
+                }
+                
+                // Change button to update mode for next submission
+                const submitButton = document.querySelector('button[type="submit"]');
+                submitButton.innerHTML = '<i class="fas fa-sync-alt mr-3 animate-spin text-yellow-600"></i>อัพเดทข้อมูล';
+                submitButton.className = 'flex-1 bg-gradient-to-r from-orange-300 to-red-300 hover:from-orange-400 hover:to-red-400 text-black font-semibold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center text-lg shadow-lg';
+                
+                // Show clear form button
+                const clearButton = document.getElementById('clearFormBtn');
+                clearButton.style.display = 'flex';
+                
+                // Set to update mode for future submissions
+                window.isUpdateMode = true;
+                
+                // Don't reset form - keep data for easy editing
+                // Don't clear image previews - keep them visible
+                
+            } catch (error) {
+                console.error('Form submission failed:', error);
+                
+                // Close loading alert
+                Swal.close();
+                
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง',
+                    confirmButtonText: 'ตกลง',
+                    confirmButtonColor: '#ef4444'
+                });
+            }
+        });
+
+        // Function to send data to Google Sheets - single request only
+        async function sendDataToGoogleSheets(data) {
+            const postData = new FormData();
+            
+            // Check if this ID card already exists (for update vs create)
+            const existingRecord = await checkExistingRecord(data.idCard);
+            
+            if (existingRecord) {
+                postData.append('action', 'update');
+                window.isUpdateMode = true;
+            } else {
+                postData.append('action', 'create');
+                window.isUpdateMode = false;
+            }
+            
+            Object.keys(data).forEach(key => {
+                if (data[key] !== null && data[key] !== undefined && data[key] !== '') {
+                    postData.append(key, data[key]);
+                }
+            });
+
+            // Send single request only
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: postData,
+                mode: 'no-cors'
+            });
+            
+            // Wait a bit to ensure processing
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+
+        // Check if record exists by ID card number
+        async function checkExistingRecord(idCard) {
+            if (!idCard) return false;
+            
+            try {
+                const params = new URLSearchParams();
+                params.append('action', 'checkExists');
+                params.append('idCard', idCard);
+                
+                const response = await fetch(SCRIPT_URL + '?' + params.toString(), {
+                    method: 'GET',
+                    mode: 'no-cors'
+                });
+                
+                // Since we can't read the response in no-cors mode,
+                // we'll assume it exists if this is not the first submission
+                return window.hasSubmittedBefore || false;
+            } catch (error) {
+                console.log('Check existing record failed:', error);
+                return window.hasSubmittedBefore || false;
+            }
+        }
+
+
+
+        // Preview image function - updated to handle multiple previews
+        function previewImage(input, previewId, statusId) {
+            const preview = document.getElementById(previewId);
+            const status = document.getElementById(statusId);
+            
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const fileSize = file.size;
+                const sizeStatus = getFileSizeStatus(fileSize);
+                
+                // Show file info
+                status.innerHTML = `
+                    <div class="flex items-center space-x-2">
+                        <span>${sizeStatus.color}</span>
+                        <span class="text-gray-700">${formatFileSize(fileSize)}</span>
+                        <span class="text-gray-600">${sizeStatus.text}</span>
+                    </div>
+                `;
+                
+                // Show preview for images
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.innerHTML = `
+                            <img src="${e.target.result}" alt="ตัวอย่างรูปภาพ" class="w-32 h-32 object-cover rounded-lg border-2 border-gray-300 shadow-lg">
+                        `;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    // Show file icon for non-images (like PDF)
+                    preview.innerHTML = `
+                        <div class="w-32 h-32 bg-gray-100 rounded-lg border-2 border-gray-300 shadow-lg flex items-center justify-center">
+                            <i class="fas fa-file-pdf text-red-500 text-4xl"></i>
+                        </div>
+                    `;
+                }
+            } else {
+                preview.innerHTML = '';
+                status.innerHTML = '';
+            }
+        }
+
+        // Update data function - single request only
+        async function updateData(data) {
+            // Handle image uploads
+            const imageFields = ['personalImage', 'licenseDocument', 'educationDocument', 'specializedDocument'];
+            
+            for (const fieldName of imageFields) {
+                const fileInput = document.querySelector(`input[name="${fieldName}"]`);
+                if (fileInput && fileInput.files && fileInput.files[0]) {
+                    const imageData = await handleImageUpload(fileInput.files[0]);
+                    data[fieldName] = imageData;
+                }
+            }
+
+            // Use personal image for staff photo as well
+            data.staffPhoto = data.personalImage;
+
+            // Create form data for POST request
+            const postData = new FormData();
+            postData.append('action', 'update');
+            postData.append('idCard', data.idCard); // Use ID card as identifier
+            
+            // Append all data to FormData
+            Object.keys(data).forEach(key => {
+                if (data[key] !== null && data[key] !== undefined && data[key] !== '') {
+                    postData.append(key, data[key]);
+                }
+            });
+
+            // Send single update request only
+            const response = await fetch(SCRIPT_URL, {
+                method: 'POST',
+                body: postData,
+                mode: 'no-cors'
+            });
+
+            // Wait a bit to ensure processing
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+
+        // Modal functions
+        function showDataModal(data) {
+            const modal = document.getElementById('dataModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            const fieldLabels = {
+                idCard: 'เลขบัตรประชาชน',
+                prefix: 'คำนำหน้า',
+                fullName: 'ชื่อ-นามสกุล',
+                birthDate: 'วันเกิด',
+                age: 'อายุ',
+                phone: 'เบอร์โทรศัพท์',
+                email: 'อีเมล',
+                department: 'หน่วยงาน',
+                position: 'ตำแหน่ง',
+                positionNumber: 'เลขที่ประจำตำแหน่ง',
+                positionLevel: 'ระดับตำแหน่ง',
+                positionType: 'ประเภทตำแหน่ง',
+                expertise: 'ด้านความชำนาญ',
+                licenseNumber: 'เลขใบประกอบวิชาชีพ',
+                nursingCouncilNumber: 'เลขที่สมาชิกสภาการพยาบาล',
+                licenseExpiry: 'วันหมดอายุใบประกอบวิชาชีพ',
+                startDate: 'วันที่เริ่มปฏิบัติงาน',
+                appointmentDate: 'วันที่บรรจุราชการ',
+                specialistDate: 'วันที่ดำรงตำแหน่งพยาบาลวิชาชีพชำนาญการ',
+                retirementYear: 'ปีที่เกษียณอายุราชการ',
+                education: 'ระดับการศึกษา',
+                bachelorField: 'วุฒิปริญญาตรี',
+                masterField: 'วุฒิปริญญาโท',
+                doctoralField: 'วุฒิปริญญาเอก',
+                specializedNursing: 'หลักสูตรการพยาบาลเฉพาะทาง',
+                workType: 'ประเภทการปฏิบัติงาน',
+                workExperience: 'อายุงาน'
+            };
+            
+            let content = '';
+            
+            // Show images first if available
+            const imageFields = {
+                personalImage: 'รูปภาพประจำตัว',
+                licenseDocument: 'เอกสารใบประกอบวิชาชีพ',
+                educationDocument: 'เอกสารใบสำเร็จการศึกษา',
+                specializedDocument: 'เอกสารวุฒิบัตร'
+            };
+            
+            let hasImages = false;
+            let imageContent = '<div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center"><i class="fas fa-images text-blue-500 mr-2"></i>เอกสารและรูปภาพ</h3><div class="grid grid-cols-2 md:grid-cols-4 gap-4">';
+            
+            Object.keys(imageFields).forEach(key => {
+                if (data[key] && data[key] !== '' && data[key].startsWith('data:image')) {
+                    hasImages = true;
+                    imageContent += `
+                        <div class="text-center">
+                            <img src="${data[key]}" alt="${imageFields[key]}" class="w-full h-32 object-cover rounded-lg border-2 border-gray-300 shadow-lg mb-2">
+                            <div class="text-xs text-gray-600">${imageFields[key]}</div>
+                        </div>
+                    `;
+                }
+            });
+            
+            imageContent += '</div></div>';
+            
+            if (hasImages) {
+                content += imageContent;
+            }
+            
+            // Show data fields
+            content += '<div class="mb-4"><h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center"><i class="fas fa-info-circle text-emerald-500 mr-2"></i>ข้อมูลส่วนตัว</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+            
+            Object.keys(fieldLabels).forEach(key => {
+                if (data[key] && data[key] !== '') {
+                    content += `
+                        <div class="bg-white p-3 rounded-lg border border-pink-200">
+                            <div class="text-sm text-gray-600 font-medium">${fieldLabels[key]}</div>
+                            <div class="text-gray-800">${data[key]}</div>
+                        </div>
+                    `;
+                }
+            });
+            
+            content += '</div></div>';
+            modalContent.innerHTML = content;
+            modal.style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('dataModal').style.display = 'none';
+        }
+        
+        function editData() {
+            if (window.currentData) {
+                // Populate form with current data
+                const form = document.getElementById('staffForm');
+                Object.keys(window.currentData).forEach(key => {
+                    const input = form.querySelector(`[name="${key}"]`);
+                    if (input && window.currentData[key]) {
+                        input.value = window.currentData[key];
+                    }
+                });
+                
+                // Trigger age calculation if birth date exists
+                if (window.currentData.birthDate) {
+                    calculateAge();
+                }
+                
+                // Trigger work experience calculation if start date exists
+                if (window.currentData.startWorkDate) {
+                    calculateWorkExperience();
+                }
+                
+                // Change submit button to update mode
+                const submitButton = document.querySelector('button[type="submit"]');
+                submitButton.innerHTML = '<i class="fas fa-sync-alt mr-3 animate-spin text-yellow-600"></i>อัพเดทข้อมูล';
+                submitButton.className = 'flex-1 bg-gradient-to-r from-orange-300 to-red-300 hover:from-orange-400 hover:to-red-400 text-black font-semibold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center text-lg shadow-lg';
+                
+                // Set form to update mode
+                window.isUpdateMode = true;
+                
+                closeModal();
+                
+                // Scroll to top of form
+                document.getElementById('registrationForm').scrollIntoView({ 
+                    behavior: 'smooth' 
+                });
+                
+                Swal.fire({
+                    icon: 'info',
+                    title: 'โหมดแก้ไขข้อมูล',
+                    text: 'ข้อมูลได้ถูกโหลดในฟอร์มแล้ว คุณสามารถแก้ไขและอัพเดทข้อมูลได้',
+                    confirmButtonText: 'เข้าใจแล้ว',
+                    confirmButtonColor: '#f8b4cb'
+                });
+            }
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('dataModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Clear form function
+        function clearForm() {
+            Swal.fire({
+                title: 'ต้องการล้างข้อมูลทั้งหมด?',
+                text: 'ข้อมูลที่กรอกจะหายทั้งหมด',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'ใช่ ล้างข้อมูล',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Reset form
+                    document.getElementById('staffForm').reset();
+                    
+                    // Clear all image previews
+                    document.getElementById('personalImagePreview').innerHTML = '';
+                    document.getElementById('personalImageStatus').innerHTML = '';
+                    document.getElementById('licenseDocumentPreview').innerHTML = '';
+                    document.getElementById('licenseDocumentStatus').innerHTML = '';
+                    document.getElementById('educationDocumentPreview').innerHTML = '';
+                    document.getElementById('educationDocumentStatus').innerHTML = '';
+                    document.getElementById('specializedDocumentPreview').innerHTML = '';
+                    document.getElementById('specializedDocumentStatus').innerHTML = '';
+                    
+                    // Reset to create mode
+                    window.isUpdateMode = false;
+                    window.hasSubmittedBefore = false;
+                    window.currentData = null;
+                    
+                    // Reset submit button
+                    const submitButton = document.querySelector('button[type="submit"]');
+                    submitButton.innerHTML = '<i class="fas fa-save mr-3 animate-bounce text-yellow-600"></i>บันทึกข้อมูล';
+                    submitButton.className = 'flex-1 bg-gradient-to-r from-pink-300 to-purple-300 hover:from-pink-400 hover:to-purple-400 text-black font-semibold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center text-lg shadow-lg';
+                    
+                    // Hide clear button
+                    const clearButton = document.getElementById('clearFormBtn');
+                    clearButton.style.display = 'none';
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ล้างข้อมูลเรียบร้อย!',
+                        text: 'พร้อมสำหรับการลงทะเบียนใหม่',
+                        confirmButtonText: 'ตกลง',
+                        confirmButtonColor: '#10b981'
+                    });
+                }
+            });
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDropdownData();
+        });
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97f025aa81be55a1',t:'MTc1Nzg1NTY2NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
