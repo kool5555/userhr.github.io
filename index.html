@@ -8,83 +8,106 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Sarabun', sans-serif; }
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        @import url('https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600;700;800&display=swap');
+        
+        body { 
+            font-family: 'Sarabun', sans-serif; 
+            font-size: 18px;
+            line-height: 1.6;
         }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
         .form-section {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 16px;
             padding: 1.5rem;
             margin-bottom: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
+        
         .form-group {
             margin-bottom: 1rem;
         }
+        
         .form-label {
             display: block;
-            font-weight: 500;
-            color: #374151;
-            margin-bottom: 0.5rem;
-            font-size: 0.875rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
         }
+        
         .form-input {
             width: 100%;
-            padding: 0.75rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 0.875rem;
+            padding: 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 1rem;
             transition: all 0.3s ease;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
+            font-weight: 500;
         }
+        
         .form-input:focus {
             outline: none;
             border-color: #f8b4cb;
-            box-shadow: 0 0 0 3px rgba(248, 180, 203, 0.2);
+            box-shadow: 0 0 0 4px rgba(248, 180, 203, 0.25);
             background: rgba(255, 255, 255, 1);
+            transform: translateY(-2px);
         }
+        
         .section-title {
-            font-size: 1.125rem;
-            font-weight: 600;
+            font-size: 1.5rem;
+            font-weight: 700;
             color: #1f2937;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.75rem;
         }
+        
         .fade-in {
-            animation: fadeIn 0.5s ease-in;
+            animation: fadeIn 0.6s ease-in;
         }
+        
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
+        
         @keyframes bounce {
             0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-10px); }
-            60% { transform: translateY(-5px); }
+            40% { transform: translateY(-12px); }
+            60% { transform: translateY(-6px); }
         }
+        
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
+            50% { transform: scale(1.15); }
             100% { transform: scale(1); }
         }
+        
         @keyframes rotate {
             from { transform: rotate(0deg); }
             to { transform: rotate(360deg); }
         }
+        
         @keyframes float {
             0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
+            50% { transform: translateY(-15px); }
         }
+        
         .animate-bounce { animation: bounce 2s infinite; }
         .animate-pulse { animation: pulse 2s infinite; }
         .animate-rotate { animation: rotate 3s linear infinite; }
         .animate-float { animation: float 3s ease-in-out infinite; }
+        
         .modal {
             display: none;
             position: fixed;
@@ -93,43 +116,210 @@
             top: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(5px);
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
         }
+        
         .modal-content {
             background: linear-gradient(135deg, #fef7ff 0%, #f3e8ff 100%);
             margin: 2% auto;
-            padding: 2rem;
-            border-radius: 16px;
+            padding: 2.5rem;
+            border-radius: 20px;
             width: 90%;
-            max-width: 800px;
+            max-width: 900px;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
         }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #f8b4cb 0%, #c084fc 100%);
+            color: #1f2937;
+            font-weight: 700;
+            font-size: 1.125rem;
+            padding: 1.25rem 2rem;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(248, 180, 203, 0.4);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(248, 180, 203, 0.6);
+        }
+        
+        .btn-secondary {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: #1f2937;
+            font-weight: 700;
+            font-size: 1.125rem;
+            padding: 1.25rem 2rem;
+            border-radius: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(251, 191, 36, 0.4);
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(251, 191, 36, 0.6);
+        }
+        
+        .header-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1e40af;
+        }
+        
+        .header-subtitle {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+        
+        /* Mobile Optimizations */
         @media (max-width: 768px) {
+            body {
+                font-size: 14px;
+                line-height: 1.4;
+            }
+            
             .form-section {
                 padding: 1rem;
                 margin-bottom: 1rem;
+                border-radius: 12px;
             }
+            
             .modal-content {
-                margin: 5% auto;
+                margin: 2% auto;
                 padding: 1rem;
-                width: 95%;
+                width: 98%;
+                max-height: 95vh;
             }
+            
+            .section-title {
+                font-size: 1.1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .header-title {
+                font-size: 1.3rem;
+            }
+            
+            .header-subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .form-input {
+                padding: 0.75rem;
+                font-size: 0.9rem;
+                border-radius: 8px;
+            }
+            
+            .form-label {
+                font-size: 0.85rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .btn-primary, .btn-secondary {
+                padding: 1rem 1.5rem;
+                font-size: 1rem;
+                border-radius: 12px;
+            }
+            
+            .grid {
+                gap: 0.75rem;
+            }
+            
+            .container {
+                padding-left: 0.5rem;
+                padding-right: 0.5rem;
+            }
+            
+            /* Optimize image previews for mobile */
+            .image-preview {
+                width: 120px;
+                height: 120px;
+            }
+            
+            /* Faster animations on mobile */
+            .animate-bounce, .animate-pulse, .animate-rotate, .animate-float {
+                animation-duration: 1s;
+            }
+            
+            /* Reduce backdrop blur for better performance */
+            .glass-effect {
+                backdrop-filter: blur(8px);
+            }
+            
+            /* Optimize modal for mobile */
+            .modal {
+                backdrop-filter: blur(4px);
+            }
+        }
+        
+        /* Performance optimizations */
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .form-input {
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+        
+        /* Lazy loading for images */
+        .image-preview {
+            loading: lazy;
+        }
+        
+        /* Reduce repaints */
+        .form-section {
+            will-change: transform;
+        }
+        
+        .image-preview {
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .image-preview:hover {
+            transform: scale(1.05);
+        }
+        
+        .status-indicator {
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        .loading-spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #f8b4cb;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body class="min-h-screen bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-100">
 
     <!-- Header -->
-    <header class="glass-effect p-4 mb-8">
+    <header class="glass-effect p-6 mb-10">
         <div class="container mx-auto flex items-center justify-center">
-            <div class="flex items-center space-x-4">
-                <i class="fas fa-hospital text-blue-600 text-3xl"></i>
-                <div>
-                    <h1 class="text-blue-900 text-xl font-bold">ระบบทะเบียนบุคลากร</h1>
-                    <p class="text-blue-800 text-sm">สถาบันบำราศนราดูร</p>
+            <div class="flex items-center space-x-6">
+                <i class="fas fa-hospital text-blue-600 text-4xl animate-pulse"></i>
+                <div class="text-center">
+                    <h1 class="header-title">ระบบทะเบียนบุคลากร</h1>
+                    <p class="header-subtitle">สถาบันบำราศนราดูร</p>
                 </div>
             </div>
         </div>
@@ -138,7 +328,7 @@
     <div class="container mx-auto px-4">
         <!-- Registration Form -->
         <div id="registrationForm" class="fade-in">
-            <div class="max-w-6xl mx-auto px-4">
+            <div class="max-w-7xl mx-auto px-4">
                 <form id="staffForm">
                     <!-- ข้อมูลส่วนตัว -->
                     <div class="form-section">
@@ -147,11 +337,11 @@
                         </h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-id-card text-blue-500 mr-2"></i>เลขที่บัตรประจำตัวประชาชน *</label>
+                                <label class="form-label"><i class="fas fa-id-card text-blue-500 mr-3"></i>เลขที่บัตรประจำตัวประชาชน *</label>
                                 <input type="text" name="idCard" required class="form-input" maxlength="13" placeholder="1234567890123">
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-user-tag text-purple-500 mr-2"></i>คำนำหน้า *</label>
+                                <label class="form-label"><i class="fas fa-user-tag text-purple-500 mr-3"></i>คำนำหน้า *</label>
                                 <select name="prefix" required class="form-input">
                                     <option value="">เลือกคำนำหน้า</option>
                                     <option value="นาย">นาย</option>
@@ -161,35 +351,35 @@
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-signature text-pink-500 mr-2"></i>ชื่อ - นามสกุล *</label>
+                                <label class="form-label"><i class="fas fa-signature text-pink-500 mr-3"></i>ชื่อ - นามสกุล *</label>
                                 <input type="text" name="fullName" required class="form-input" placeholder="ชื่อ นามสกุล">
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-birthday-cake text-orange-500 mr-2"></i>วันเดือนปีเกิด *</label>
+                                <label class="form-label"><i class="fas fa-birthday-cake text-orange-500 mr-3"></i>วันเดือนปีเกิด *</label>
                                 <input type="date" name="birthDate" required class="form-input" onchange="calculateAge()">
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-phone text-green-500 mr-2"></i>หมายเลขโทรศัพท์</label>
+                                <label class="form-label"><i class="fas fa-phone text-green-500 mr-3"></i>หมายเลขโทรศัพท์</label>
                                 <input type="tel" name="phone" class="form-input" placeholder="08xxxxxxxx" maxlength="10">
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-envelope text-red-500 mr-2"></i>อีเมลล์</label>
+                                <label class="form-label"><i class="fas fa-envelope text-red-500 mr-3"></i>อีเมลล์</label>
                                 <input type="email" name="email" class="form-input" placeholder="example@email.com">
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-calendar-alt text-indigo-500 mr-2"></i>อายุ</label>
+                                <label class="form-label"><i class="fas fa-calendar-alt text-indigo-500 mr-3"></i>อายุ</label>
                                 <input type="number" name="age" class="form-input bg-gray-100" readonly placeholder="คำนวณอัตโนมัติ">
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-hourglass-end text-amber-500 mr-2"></i>ปีที่เกษียณอายุราชการ</label>
+                                <label class="form-label"><i class="fas fa-hourglass-end text-amber-500 mr-3"></i>ปีที่เกษียณอายุราชการ</label>
                                 <input type="number" name="retirementYear" class="form-input bg-gray-100" readonly placeholder="คำนวณอัตโนมัติ">
                             </div>
                         </div>
-                        <div class="form-group mt-4">
-                            <label class="form-label"><i class="fas fa-camera text-cyan-500 mr-2"></i>รูปภาพประจำตัว</label>
+                        <div class="form-group mt-6">
+                            <label class="form-label"><i class="fas fa-camera text-cyan-500 mr-3"></i>รูปภาพประจำตัว</label>
                             <input type="file" name="personalImage" accept="image/*" class="form-input" onchange="previewImage(this, 'personalImagePreview', 'personalImageStatus')">
-                            <div id="personalImagePreview" class="mt-2"></div>
-                            <div id="personalImageStatus" class="mt-1 text-sm text-gray-600"></div>
+                            <div id="personalImagePreview" class="mt-4"></div>
+                            <div id="personalImageStatus" class="mt-2"></div>
                         </div>
                     </div>
 
@@ -200,35 +390,35 @@
                         </h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-building text-blue-600 mr-2"></i>หน่วยงานที่ปฏิบัติงานปัจจุบัน</label>
+                                <label class="form-label"><i class="fas fa-building text-blue-600 mr-3"></i>หน่วยงานที่ปฏิบัติงานปัจจุบัน</label>
                                 <select name="department" class="form-input">
                                     <option value="">เลือกหน่วยงาน</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-user-tie text-indigo-600 mr-2"></i>ตำแหน่ง</label>
+                                <label class="form-label"><i class="fas fa-user-tie text-indigo-600 mr-3"></i>ตำแหน่ง</label>
                                 <select name="position" class="form-input">
                                     <option value="">เลือกตำแหน่ง</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-hashtag text-purple-600 mr-2"></i>เลขที่ประจำตำแหน่ง</label>
+                                <label class="form-label"><i class="fas fa-hashtag text-purple-600 mr-3"></i>เลขที่ประจำตำแหน่ง</label>
                                 <input type="text" name="positionNumber" class="form-input" placeholder="เลขที่ตำแหน่ง">
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-layer-group text-teal-600 mr-2"></i>ระดับของตำแหน่ง</label>
+                                <label class="form-label"><i class="fas fa-layer-group text-teal-600 mr-3"></i>ระดับของตำแหน่ง</label>
                                 <select name="positionLevel" class="form-input">
                                     <option value="">เลือกระดับตำแหน่ง</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-tags text-emerald-600 mr-2"></i>ประเภทของตำแหน่ง</label>
+                                <label class="form-label"><i class="fas fa-tags text-emerald-600 mr-3"></i>ประเภทของตำแหน่ง</label>
                                 <select name="positionType" class="form-input">
                                     <option value="">เลือกประเภทตำแหน่ง</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-star text-yellow-600 mr-2"></i>ด้านความชำนาญของตำแหน่ง</label>
+                                <label class="form-label"><i class="fas fa-star text-yellow-600 mr-3"></i>ด้านความชำนาญของตำแหน่ง</label>
                                 <select name="expertise" class="form-input">
                                     <option value="">เลือกด้านความชำนาญ</option>
                                 </select>
@@ -243,42 +433,40 @@
                         </h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-id-badge text-blue-500 mr-2"></i>เลขที่ใบประกอบวิชาชีพ</label>
+                                <label class="form-label"><i class="fas fa-id-badge text-blue-500 mr-3"></i>เลขที่ใบประกอบวิชาชีพ</label>
                                 <input type="text" name="licenseNumber" class="form-input" placeholder="เลขที่ใบประกอบวิชาชีพ">
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-user-nurse text-pink-500 mr-2"></i>เลขที่สมาชิกสภาการพยาบาล</label>
+                                <label class="form-label"><i class="fas fa-user-nurse text-pink-500 mr-3"></i>เลขที่สมาชิกสภาการพยาบาล</label>
                                 <input type="text" name="nursingCouncilNumber" class="form-input" placeholder="เลขที่สมาชิก">
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-calendar-times text-red-500 mr-2"></i>วันหมดอายุใบประกอบวิชาชีพ</label>
+                                <label class="form-label"><i class="fas fa-calendar-times text-red-500 mr-3"></i>วันหมดอายุใบประกอบวิชาชีพ</label>
                                 <input type="date" name="licenseExpiry" class="form-input">
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-play-circle text-green-500 mr-2"></i>วันที่เริ่มปฏิบัติงาน</label>
+                                <label class="form-label"><i class="fas fa-play-circle text-green-500 mr-3"></i>วันที่เริ่มปฏิบัติงาน</label>
                                 <input type="date" name="startDate" class="form-input" onchange="calculateWorkExperience()">
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-clock text-orange-500 mr-2"></i>อายุงาน</label>
+                                <label class="form-label"><i class="fas fa-clock text-orange-500 mr-3"></i>อายุงาน</label>
                                 <input type="text" name="workExperience" class="form-input bg-gray-100" readonly placeholder="คำนวณอัตโนมัติ">
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-calendar-check text-purple-500 mr-2"></i>วันที่บรรจุราชการ</label>
+                                <label class="form-label"><i class="fas fa-calendar-check text-purple-500 mr-3"></i>วันที่บรรจุราชการ</label>
                                 <input type="date" name="appointmentDate" class="form-input">
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-medal text-yellow-500 mr-2"></i>วันที่ดำรงตำแหน่ง พยาบาลวิชาชีพชำนาญการ</label>
+                                <label class="form-label"><i class="fas fa-medal text-yellow-500 mr-3"></i>วันที่ดำรงตำแหน่ง พยาบาลวิชาชีพชำนาญการ</label>
                                 <input type="date" name="specialistDate" class="form-input">
                             </div>
                         </div>
-                        <div class="form-group mt-4">
-                            <label class="form-label"><i class="fas fa-file-medical text-teal-500 mr-2"></i>แนบเอกสารใบประกอบวิชาชีพ</label>
+                        <div class="form-group mt-6">
+                            <label class="form-label"><i class="fas fa-file-medical text-teal-500 mr-3"></i>แนบเอกสารใบประกอบวิชาชีพ</label>
                             <input type="file" name="licenseDocument" accept="image/*,.pdf" class="form-input" onchange="previewImage(this, 'licenseDocumentPreview', 'licenseDocumentStatus')">
-                            <div id="licenseDocumentPreview" class="mt-2"></div>
-                            <div id="licenseDocumentStatus" class="mt-1 text-sm text-gray-600"></div>
+                            <div id="licenseDocumentPreview" class="mt-4"></div>
+                            <div id="licenseDocumentStatus" class="mt-2"></div>
                         </div>
-                        <!-- Hidden staff photo field - uses same as personal image -->
-                        <input type="hidden" name="staffPhoto" value="">
                     </div>
 
                     <!-- ข้อมูลการศึกษา -->
@@ -288,40 +476,40 @@
                         </h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-university text-blue-600 mr-2"></i>ระดับการศึกษาสูงสุด</label>
+                                <label class="form-label"><i class="fas fa-university text-blue-600 mr-3"></i>ระดับการศึกษาสูงสุด</label>
                                 <select name="educationLevel" class="form-input">
                                     <option value="">เลือกระดับการศึกษา</option>
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-graduation-cap text-green-600 mr-2"></i>วุฒิปริญญาตรี สาขา</label>
+                                <label class="form-label"><i class="fas fa-graduation-cap text-green-600 mr-3"></i>วุฒิปริญญาตรี สาขา</label>
                                 <input type="text" name="bachelorField" class="form-input" placeholder="สาขาวิชา">
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-user-graduate text-purple-600 mr-2"></i>วุฒิปริญญาโท สาขา</label>
+                                <label class="form-label"><i class="fas fa-user-graduate text-purple-600 mr-3"></i>วุฒิปริญญาโท สาขา</label>
                                 <input type="text" name="masterField" class="form-input" placeholder="สาขาวิชา">
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-crown text-yellow-600 mr-2"></i>วุฒิปริญญาเอก สาขา</label>
+                                <label class="form-label"><i class="fas fa-crown text-yellow-600 mr-3"></i>วุฒิปริญญาเอก สาขา</label>
                                 <input type="text" name="doctoralField" class="form-input" placeholder="สาขาวิชา">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label class="form-label"><i class="fas fa-stethoscope text-pink-600 mr-2"></i>หลักสูตรการพยาบาลเฉพาะทางสาขา</label>
+                            <label class="form-label"><i class="fas fa-stethoscope text-pink-600 mr-3"></i>หลักสูตรการพยาบาลเฉพาะทางสาขา</label>
                             <input type="text" name="specializedNursing" class="form-input" placeholder="สาขาการพยาบาลเฉพาะทาง">
                         </div>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-scroll text-indigo-500 mr-2"></i>แนบเอกสารใบสำเร็จการศึกษา</label>
+                                <label class="form-label"><i class="fas fa-scroll text-indigo-500 mr-3"></i>แนบเอกสารใบสำเร็จการศึกษา</label>
                                 <input type="file" name="educationDocument" accept="image/*,.pdf" class="form-input" onchange="previewImage(this, 'educationDocumentPreview', 'educationDocumentStatus')">
-                                <div id="educationDocumentPreview" class="mt-2"></div>
-                                <div id="educationDocumentStatus" class="mt-1 text-sm text-gray-600"></div>
+                                <div id="educationDocumentPreview" class="mt-4"></div>
+                                <div id="educationDocumentStatus" class="mt-2"></div>
                             </div>
                             <div class="form-group">
-                                <label class="form-label"><i class="fas fa-certificate text-amber-500 mr-2"></i>แนบเอกสารวุฒิบัตร</label>
+                                <label class="form-label"><i class="fas fa-certificate text-amber-500 mr-3"></i>แนบเอกสารวุฒิบัตร</label>
                                 <input type="file" name="specializedDocument" accept="image/*,.pdf" class="form-input" onchange="previewImage(this, 'specializedDocumentPreview', 'specializedDocumentStatus')">
-                                <div id="specializedDocumentPreview" class="mt-2"></div>
-                                <div id="specializedDocumentStatus" class="mt-1 text-sm text-gray-600"></div>
+                                <div id="specializedDocumentPreview" class="mt-4"></div>
+                                <div id="specializedDocumentStatus" class="mt-2"></div>
                             </div>
                         </div>
                     </div>
@@ -332,19 +520,19 @@
                             <i class="fas fa-info-circle text-orange-500 animate-pulse"></i>ข้อมูลเพิ่มเติม
                         </h3>
                         <div class="form-group">
-                            <label class="form-label"><i class="fas fa-clipboard-list text-teal-600 mr-2"></i>ประเภทการเข้า/ออกปฏิบัติการในสถาบันบำราศนราดูร</label>
+                            <label class="form-label"><i class="fas fa-clipboard-list text-teal-600 mr-3"></i>ประเภทการเข้า/ออกปฏิบัติการในสถาบันบำราศนราดูร</label>
                             <input type="text" name="workType" class="form-input" placeholder="กรอกประเภทการปฏิบัติงาน">
                         </div>
                     </div>
 
                     <!-- ปุ่มบันทึก -->
                     <div class="form-section">
-                        <div class="flex gap-4">
-                            <button type="submit" class="flex-1 bg-gradient-to-r from-pink-300 to-purple-300 hover:from-pink-400 hover:to-purple-400 text-black font-semibold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center text-lg shadow-lg">
-                                <i class="fas fa-save mr-3 animate-bounce text-yellow-600"></i>บันทึกข้อมูล
+                        <div class="flex gap-6">
+                            <button type="submit" class="flex-1 btn-primary flex items-center justify-center">
+                                <i class="fas fa-save mr-4 animate-bounce text-yellow-600 text-xl"></i>บันทึกข้อมูล
                             </button>
-                            <button type="button" id="clearFormBtn" onclick="clearForm()" class="flex-1 bg-gradient-to-r from-gray-300 to-gray-400 hover:from-gray-400 hover:to-gray-500 text-black font-semibold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center text-lg shadow-lg" style="display: none;">
-                                <i class="fas fa-broom mr-3 text-blue-600"></i>ล้างข้อมูล
+                            <button type="button" id="clearFormBtn" onclick="clearForm()" class="flex-1 btn-secondary flex items-center justify-center" style="display: none;">
+                                <i class="fas fa-broom mr-4 text-blue-600 text-xl"></i>ล้างข้อมูล
                             </button>
                         </div>
                     </div>
@@ -355,24 +543,24 @@
         <!-- Data Details Modal -->
         <div id="dataModal" class="modal">
             <div class="modal-content">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-800 flex items-center">
-                        <i class="fas fa-user-check text-emerald-500 mr-3 animate-bounce"></i>
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-bold text-gray-800 flex items-center">
+                        <i class="fas fa-user-check text-emerald-500 mr-4 animate-bounce"></i>
                         ข้อมูลที่บันทึกเรียบร้อยแล้ว
                     </h2>
-                    <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">
+                    <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-3xl">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <div id="modalContent" class="space-y-4">
+                <div id="modalContent" class="space-y-6">
                     <!-- Content will be populated by JavaScript -->
                 </div>
-                <div class="flex gap-4 mt-6">
-                    <button onclick="editData()" class="flex-1 bg-gradient-to-r from-blue-300 to-indigo-300 hover:from-blue-400 hover:to-indigo-400 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center">
-                        <i class="fas fa-edit mr-2 animate-pulse text-yellow-300"></i>แก้ไขข้อมูล
+                <div class="flex gap-6 mt-8">
+                    <button onclick="editData()" class="flex-1 btn-primary flex items-center justify-center">
+                        <i class="fas fa-edit mr-3 animate-pulse text-yellow-300 text-lg"></i>แก้ไขข้อมูล
                     </button>
-                    <button onclick="closeModal()" class="flex-1 bg-gradient-to-r from-gray-300 to-gray-400 hover:from-gray-400 hover:to-gray-500 text-white font-semibold py-3 px-6 rounded-lg transition-all duration-300 flex items-center justify-center">
-                        <i class="fas fa-check mr-2 text-green-400"></i>ปิด
+                    <button onclick="closeModal()" class="flex-1 btn-secondary flex items-center justify-center">
+                        <i class="fas fa-check mr-3 text-green-400 text-lg"></i>ปิด
                     </button>
                 </div>
             </div>
@@ -380,6 +568,7 @@
     </div>
 
     <script>
+        // Configuration - ตรงกับโค้ด GS ของคุณ
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyyOMbDhvb0cCpuI2tS5tLbZ54JwhK6H6nhW83IddLPBhS_4FnbhINEK69IhKbyfQE57A/exec';
         const SHEET_ID = '1COt-ehxsy2b8B7zomUozR9Qpuo6j09rsGKSlaGABQro';
         const SHEET_NAME = 'ชีต1';
@@ -459,39 +648,79 @@
             }
         }
 
-        // Image compression functions
-        function compressImage(file, maxWidth = 800, maxHeight = 600, quality = 0.8) {
+        // Enhanced image compression for mobile performance
+        function compressImage(file, maxWidth = 600, maxHeight = 450, quality = 0.7) {
             return new Promise((resolve) => {
+                // Mobile-optimized compression settings
+                const isMobile = window.innerWidth <= 768;
+                const finalMaxWidth = isMobile ? Math.min(maxWidth, 400) : maxWidth;
+                const finalMaxHeight = isMobile ? Math.min(maxHeight, 300) : maxHeight;
+                const finalQuality = isMobile ? Math.min(quality, 0.6) : quality;
+                
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
                 const img = new Image();
                 
                 img.onload = function() {
-                    // Calculate new dimensions
                     let { width, height } = img;
                     
+                    // Calculate new dimensions
+                    const aspectRatio = width / height;
+                    
                     if (width > height) {
-                        if (width > maxWidth) {
-                            height = (height * maxWidth) / width;
-                            width = maxWidth;
+                        if (width > finalMaxWidth) {
+                            width = finalMaxWidth;
+                            height = width / aspectRatio;
                         }
                     } else {
-                        if (height > maxHeight) {
-                            width = (width * maxHeight) / height;
-                            height = maxHeight;
+                        if (height > finalMaxHeight) {
+                            height = finalMaxHeight;
+                            width = height * aspectRatio;
                         }
+                    }
+                    
+                    // Ensure dimensions don't exceed limits
+                    if (width > finalMaxWidth) {
+                        width = finalMaxWidth;
+                        height = width / aspectRatio;
+                    }
+                    if (height > finalMaxHeight) {
+                        height = finalMaxHeight;
+                        width = height * aspectRatio;
                     }
                     
                     canvas.width = width;
                     canvas.height = height;
                     
-                    // Draw and compress
+                    // Use better image smoothing for mobile
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = isMobile ? 'medium' : 'high';
+                    
                     ctx.drawImage(img, 0, 0, width, height);
-                    canvas.toBlob(resolve, 'image/jpeg', quality);
+                    
+                    // Use webp for better compression on supported browsers
+                    const outputFormat = 'image/jpeg'; // Keep JPEG for compatibility
+                    canvas.toBlob(resolve, outputFormat, finalQuality);
                 };
                 
                 img.src = URL.createObjectURL(file);
             });
+        }
+        
+        // Fast image validation
+        function validateImageFile(file) {
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            
+            if (!validTypes.includes(file.type)) {
+                throw new Error('รองรับเฉพาะไฟล์ JPG, PNG, GIF, WebP เท่านั้น');
+            }
+            
+            if (file.size > maxSize) {
+                throw new Error('ขนาดไฟล์ต้องไม่เกิน 10MB');
+            }
+            
+            return true;
         }
 
         function formatFileSize(bytes) {
@@ -503,44 +732,111 @@
         }
 
         function getFileSizeStatus(size) {
-            if (size < 500000) return { color: '🟢', text: 'ไฟล์ขนาดเหมาะสม' };
-            if (size < 1000000) return { color: '🟡', text: 'ไฟล์ปานกลาง - อาจบีบอัดเล็กน้อย' };
-            return { color: '🔴', text: 'ไฟล์ใหญ่ - จะบีบอัดอัตโนมัติ' };
+            if (size < 500000) return { color: '🟢', text: 'ไฟล์ขนาดเหมาะสม', class: 'bg-green-100 text-green-800' };
+            if (size < 1000000) return { color: '🟡', text: 'ไฟล์ปานกลาง - อาจบีบอัดเล็กน้อย', class: 'bg-yellow-100 text-yellow-800' };
+            return { color: '🔴', text: 'ไฟล์ใหญ่ - จะบีบอัดอัตโนมัติ', class: 'bg-red-100 text-red-800' };
         }
 
-        // Load dropdown data
+        // Enhanced dropdown loading with caching and mobile optimization
         async function loadDropdownData() {
             try {
-                const response = await fetch(SCRIPT_URL + '?action=getDropdownData');
-                const data = await response.json();
+                // Check if data is cached
+                const cachedData = localStorage.getItem('dropdownData');
+                const cacheTime = localStorage.getItem('dropdownDataTime');
+                const now = Date.now();
                 
-                if (data.success) {
-                    dropdownData = data.data;
+                // Use cached data if less than 5 minutes old
+                if (cachedData && cacheTime && (now - parseInt(cacheTime)) < 300000) {
+                    console.log('📱 Using cached dropdown data');
+                    dropdownData = JSON.parse(cachedData);
                     populateDropdowns();
+                    return;
                 }
+                
+                console.log('📱 Loading fresh dropdown data...');
+                
+                // Mobile-optimized fetch with timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+                
+                const response = await fetch(SCRIPT_URL + '?action=getDropdownData', {
+                    method: 'GET',
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        dropdownData = data.data;
+                        
+                        // Cache the data
+                        localStorage.setItem('dropdownData', JSON.stringify(dropdownData));
+                        localStorage.setItem('dropdownDataTime', now.toString());
+                        
+                        console.log('📱 Dropdown data loaded and cached');
+                    }
+                }
+                
+                populateDropdowns();
+                
             } catch (error) {
                 console.error('Error loading dropdown data:', error);
-                // Load with fallback data if API fails
+                
+                // Try to use cached data even if expired
+                const cachedData = localStorage.getItem('dropdownData');
+                if (cachedData) {
+                    console.log('📱 Using expired cached data as fallback');
+                    dropdownData = JSON.parse(cachedData);
+                }
+                
                 populateDropdowns();
             }
         }
+        
+        // Clear cache function
+        function clearDropdownCache() {
+            localStorage.removeItem('dropdownData');
+            localStorage.removeItem('dropdownDataTime');
+            console.log('📱 Dropdown cache cleared');
+        }
 
         function populateDropdowns() {
-            // Populate department dropdown from column D data
+            // Populate department dropdown
             const departmentSelect = document.querySelector('select[name="department"]');
             if (departmentSelect) {
                 departmentSelect.innerHTML = '<option value="">เลือกหน่วยงาน</option>';
                 
-                // Use data from column D if available
+                // Add predefined departments with proper sorting
+                const predefinedDepartments = [
+                    'หอผู้ป่วยแยกโรค 7/2',
+                    'หอผู้ป่วยแยกโรค 7/3',
+                    'หอผู้ป่วยแยกโรค 7/4',
+                    'หอผู้ป่วยแยกโรค 7/5'
+                ];
+                
+                // Add predefined departments first
+                predefinedDepartments.forEach(dept => {
+                    departmentSelect.innerHTML += `<option value="${dept}">${dept}</option>`;
+                });
+                
+                // Add departments from data if available
                 if (dropdownData.departments && dropdownData.departments.length > 0) {
-                    const uniqueDepartments = [...new Set(dropdownData.departments.filter(dept => dept))];
+                    const uniqueDepartments = [...new Set(dropdownData.departments.filter(dept => 
+                        dept && !predefinedDepartments.includes(dept)
+                    ))];
+                    
+                    // Sort remaining departments
+                    uniqueDepartments.sort();
+                    
                     uniqueDepartments.forEach(dept => {
                         departmentSelect.innerHTML += `<option value="${dept}">${dept}</option>`;
                     });
                 }
             }
 
-            // Populate position dropdown from column H data
+            // Populate position dropdown
             const positionSelect = document.querySelector('select[name="position"]');
             if (positionSelect) {
                 positionSelect.innerHTML = '<option value="">เลือกตำแหน่ง</option>';
@@ -552,7 +848,7 @@
                 }
             }
 
-            // Populate position level dropdown from column I data + ระดับเชี่ยวชาญ (exclude ชำนาญการพิเศษ, ผู้ช่วยพยาบาล)
+            // Populate position level dropdown
             const positionLevelSelect = document.querySelector('select[name="positionLevel"]');
             if (positionLevelSelect) {
                 positionLevelSelect.innerHTML = '<option value="">เลือกระดับตำแหน่ง</option>';
@@ -567,11 +863,10 @@
                         positionLevelSelect.innerHTML += `<option value="${level}">${level}</option>`;
                     });
                 }
-                // Add ระดับเชี่ยวชาญ option
                 positionLevelSelect.innerHTML += `<option value="ระดับเชี่ยวชาญ">ระดับเชี่ยวชาญ</option>`;
             }
 
-            // Populate position type dropdown from column J data (exclude ผู้ช่วยพยาบาล)
+            // Populate position type dropdown
             const positionTypeSelect = document.querySelector('select[name="positionType"]');
             if (positionTypeSelect) {
                 positionTypeSelect.innerHTML = '<option value="">เลือกประเภทตำแหน่ง</option>';
@@ -586,7 +881,7 @@
                 }
             }
 
-            // Populate expertise dropdown from column K data (exclude อบัติเหตุและฉุกเฉิน)
+            // Populate expertise dropdown
             const expertiseSelect = document.querySelector('select[name="expertise"]');
             if (expertiseSelect) {
                 expertiseSelect.innerHTML = '<option value="">เลือกด้านความชำนาญ</option>';
@@ -601,7 +896,7 @@
                 }
             }
 
-            // Populate education level dropdown from column V data
+            // Populate education level dropdown
             const educationSelect = document.querySelector('select[name="educationLevel"]');
             if (educationSelect) {
                 educationSelect.innerHTML = '<option value="">เลือกระดับการศึกษา</option>';
@@ -612,62 +907,124 @@
                     });
                 }
             }
-
-            // Populate work type dropdown from column AE data
-            const workTypeSelect = document.querySelector('select[name="workType"]');
-            if (workTypeSelect) {
-                workTypeSelect.innerHTML = '<option value="">เลือกประเภท</option>';
-                if (dropdownData.workTypes && dropdownData.workTypes.length > 0) {
-                    const uniqueWorkTypes = [...new Set(dropdownData.workTypes.filter(type => type))];
-                    uniqueWorkTypes.forEach(type => {
-                        workTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
-                    });
-                }
-            }
         }
 
-        // Handle image upload - returns base64 data URL for GS processing
+        // Enhanced mobile-optimized image upload function
         async function handleImageUpload(file) {
             if (!file) return '';
             
-            const originalSize = file.size;
-            let compressedFile = file;
-            let compressionInfo = '';
-            
-            // First compression: 800x600, 80% quality
-            if (file.size > 500000) {
-                compressedFile = await compressImage(file, 800, 600, 0.8);
+            try {
+                // Validate file first
+                validateImageFile(file);
                 
-                // Second compression if still too large: 600x450, 60% quality
-                if (compressedFile.size > 1000000) {
-                    compressedFile = await compressImage(file, 600, 450, 0.6);
+                const originalSize = file.size;
+                let compressedFile = file;
+                
+                // Mobile-optimized compression thresholds
+                const isMobile = window.innerWidth <= 768;
+                const compressionThreshold = isMobile ? 300000 : 800000; // 300KB for mobile, 800KB for desktop
+                const maxFinalSize = isMobile ? 500000 : 1500000; // 500KB for mobile, 1.5MB for desktop
+                
+                // Compress if file is too large
+                if (file.size > compressionThreshold) {
+                    const maxWidth = isMobile ? 400 : 800;
+                    const maxHeight = isMobile ? 300 : 600;
+                    const quality = isMobile ? 0.6 : 0.7;
+                    
+                    compressedFile = await compressImage(file, maxWidth, maxHeight, quality);
+                    
+                    // If still too large, compress more aggressively
+                    if (compressedFile.size > maxFinalSize) {
+                        const aggressiveWidth = isMobile ? 300 : 600;
+                        const aggressiveHeight = isMobile ? 225 : 450;
+                        const aggressiveQuality = isMobile ? 0.4 : 0.5;
+                        
+                        compressedFile = await compressImage(file, aggressiveWidth, aggressiveHeight, aggressiveQuality);
+                    }
                 }
                 
-                const reduction = ((originalSize - compressedFile.size) / originalSize * 100).toFixed(1);
-                compressionInfo = `บีบอัดแล้ว ${reduction}% (${formatFileSize(originalSize)} → ${formatFileSize(compressedFile.size)})`;
+                // Convert to base64 with proper MIME type matching GS format
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const result = e.target.result;
+                        
+                        // Validate base64 format to match GS expectations
+                        if (!result || !result.includes('data:') || !result.includes(',')) {
+                            reject(new Error('รูปแบบ base64 ไม่ถูกต้อง'));
+                            return;
+                        }
+                        
+                        // Use regex matching exactly like GS code
+                        const matches = result.match(/^data:([^;]+);base64,(.+)$/);
+                        if (!matches) {
+                            reject(new Error('ไม่สามารถแยก MIME type ได้'));
+                            return;
+                        }
+                        
+                        const mimeType = matches[1];
+                        const base64Content = matches[2];
+                        
+                        // Validate MIME type
+                        const validMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                        if (!validMimeTypes.includes(mimeType)) {
+                            reject(new Error('รูปแบบไฟล์ไม่รองรับ: ' + mimeType));
+                            return;
+                        }
+                        
+                        // Validate base64 content
+                        if (!base64Content || base64Content.length === 0) {
+                            reject(new Error('ข้อมูลรูปภาพว่างเปล่า'));
+                            return;
+                        }
+                        
+                        // Check final size for mobile optimization
+                        const finalSizeEstimate = (base64Content.length * 3) / 4; // Rough base64 to bytes conversion
+                        
+                        console.log(`📱 Image processed (Mobile: ${isMobile}):`, {
+                            mimeType,
+                            originalSize: formatFileSize(originalSize),
+                            compressedSize: formatFileSize(compressedFile.size),
+                            base64Length: base64Content.length,
+                            estimatedFinalSize: formatFileSize(finalSizeEstimate)
+                        });
+                        
+                        resolve(result);
+                    };
+                    
+                    reader.onerror = () => reject(new Error('ไม่สามารถอ่านไฟล์ได้'));
+                    reader.readAsDataURL(compressedFile);
+                });
+                
+            } catch (error) {
+                console.error('Image upload error:', error);
+                throw error;
             }
-            
-            // Convert to base64 data URL (keep the data:image prefix for GS)
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    resolve(e.target.result); // Return full data URL with prefix
-                };
-                reader.readAsDataURL(compressedFile);
-            });
         }
 
-        // Form submission with timeout handling
+        // Helper function to generate filename for image upload
+        function generateImageFilename(fieldName, originalName) {
+            const timestamp = Date.now();
+            const extension = originalName ? originalName.split('.').pop() : 'jpg';
+            return `${fieldName}_${timestamp}.${extension}`;
+        }
+
+        // Enhanced form submission compatible with GS handleUpdatePersonnel
         document.getElementById('staffForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Check if in update mode
             const isUpdate = window.isUpdateMode || false;
             
-            // Show loading with SweetAlert2
-            const loadingAlert = Swal.fire({
+            // Show enhanced loading alert with progress
+            Swal.fire({
                 title: isUpdate ? 'กำลังอัพเดทข้อมูล...' : 'กำลังบันทึกข้อมูล...',
-                html: 'กรุณารอสักครู่',
+                html: `
+                    <div class="flex flex-col items-center space-y-4">
+                        <div class="loading-spinner"></div>
+                        <p class="text-lg font-semibold">กำลังประมวลผล...</p>
+                        <div id="uploadProgress" class="text-sm text-gray-600">เตรียมข้อมูล...</div>
+                    </div>
+                `,
                 allowOutsideClick: false,
                 showConfirmButton: false,
                 didOpen: () => {
@@ -675,185 +1032,354 @@
                 }
             });
             
-            const formData = new FormData(this);
-            const data = {};
-            
             try {
-                // Handle multiple image uploads
-                const imageFields = ['personalImage', 'licenseDocument', 'educationDocument', 'specializedDocument'];
+                const originalFormData = new FormData(this);
                 
+                // Handle image uploads with progress tracking
+                const imageFields = ['personalImage', 'licenseDocument', 'educationDocument', 'specializedDocument'];
+                let imageCount = 0;
+                let processedImages = 0;
+                
+                // Count total images to process
                 for (const fieldName of imageFields) {
-                    const imageFile = formData.get(fieldName);
+                    const imageFile = originalFormData.get(fieldName);
                     if (imageFile && imageFile.size > 0) {
-                        const imageData = await handleImageUpload(imageFile);
-                        data[fieldName] = imageData;
-                    } else {
-                        data[fieldName] = '';
+                        imageCount++;
                     }
                 }
                 
-                // Use personal image for staff photo as well
-                data.staffPhoto = data.personalImage;
+                // Update progress
+                const updateProgress = (message) => {
+                    const progressElement = document.getElementById('uploadProgress');
+                    if (progressElement) {
+                        progressElement.textContent = message;
+                    }
+                };
                 
-                // Map form fields to Google Sheets columns according to GS code
-                data.idCard = formData.get('idCard');
-                data.department = formData.get('department');
-                data.positionId = formData.get('positionNumber');
-                data.prefix = formData.get('prefix');
-                data.fullName = formData.get('fullName');
-                data.position = formData.get('position');
-                data.positionLevel = formData.get('positionLevel');
-                data.positionType = formData.get('positionType');
-                data.positionExpertise = formData.get('expertise');
-                data.birthDate = formData.get('birthDate');
-                data.licenseNumber = formData.get('licenseNumber');
-                data.nursingCouncilNumber = formData.get('nursingCouncilNumber');
-                data.licenseExpiry = formData.get('licenseExpiry');
-                data.startWorkDate = formData.get('startDate');
-                data.appointmentDate = formData.get('appointmentDate');
-                data.specialistDate = formData.get('specialistDate');
-                data.retirementYear = formData.get('retirementYear');
-                data.phone = formData.get('phone');
-                data.email = formData.get('email');
-                data.education = formData.get('educationLevel');
-                data.bachelorDegree = formData.get('bachelorField');
-                data.masterDegree = formData.get('masterField');
-                data.doctoralDegree = formData.get('doctoralField');
-                data.specializedNursing = formData.get('specializedNursing');
-                data.workType = formData.get('workType');
-                data.age = formData.get('age');
-                data.workAge = formData.get('workExperience');
-                data.licenseExpiryDate = formData.get('licenseExpiry');
+                // Prepare data object for GS handleUpdatePersonnel format
+                const personnelData = {
+                    action: isUpdate ? 'updatePersonnel' : 'addPersonnel',
+                    originalIdCard: window.currentData?.idCard || originalFormData.get('idCard'),
+                    idCard: originalFormData.get('idCard') || '',
+                    department: originalFormData.get('department') || '',
+                    positionId: originalFormData.get('positionNumber') || '',
+                    prefix: originalFormData.get('prefix') || '',
+                    fullName: originalFormData.get('fullName') || '',
+                    position: originalFormData.get('position') || '',
+                    positionLevel: originalFormData.get('positionLevel') || '',
+                    positionType: originalFormData.get('positionType') || '',
+                    positionExpertise: originalFormData.get('expertise') || '',
+                    birthDate: originalFormData.get('birthDate') || '',
+                    licenseNumber: originalFormData.get('licenseNumber') || '',
+                    nursingCouncilNumber: originalFormData.get('nursingCouncilNumber') || '',
+                    licenseExpiry: originalFormData.get('licenseExpiry') || '',
+                    startWorkDate: originalFormData.get('startDate') || '',
+                    appointmentDate: originalFormData.get('appointmentDate') || '',
+                    specialistDate: originalFormData.get('specialistDate') || '',
+                    retirementYear: originalFormData.get('retirementYear') || '',
+                    phone: originalFormData.get('phone') || '',
+                    email: originalFormData.get('email') || '',
+                    education: originalFormData.get('educationLevel') || '',
+                    bachelorDegree: originalFormData.get('bachelorField') || '',
+                    masterDegree: originalFormData.get('masterField') || '',
+                    doctoralDegree: originalFormData.get('doctoralField') || '',
+                    specializedNursing: originalFormData.get('specializedNursing') || '',
+                    workType: originalFormData.get('workType') || '',
+                    age: originalFormData.get('age') || '',
+                    workAge: originalFormData.get('workExperience') || '',
+                    licenseExpiryDate: originalFormData.get('licenseExpiry') || ''
+                };
+                
+                // Process images with progress updates
+                updateProgress(`กำลังประมวลผลรูปภาพ... (0/${imageCount})`);
+                
+                for (const fieldName of imageFields) {
+                    const imageFile = originalFormData.get(fieldName);
+                    if (imageFile && imageFile.size > 0) {
+                        try {
+                            updateProgress(`กำลังประมวลผลรูปภาพ... (${processedImages + 1}/${imageCount})`);
+                            
+                            // Process image with proper base64 encoding for GS
+                            const imageData = await handleImageUpload(imageFile);
+                            
+                            // Add image data to personnel data object
+                            personnelData[fieldName] = imageData;
+                            personnelData[fieldName + '_filename'] = generateImageFilename(fieldName, imageFile.name);
+                            
+                            processedImages++;
+                            updateProgress(`ประมวลผลรูปภาพเสร็จ (${processedImages}/${imageCount})`);
+                            
+                            console.log(`Image ${fieldName} prepared for GS:`, {
+                                filename: personnelData[fieldName + '_filename'],
+                                dataLength: imageData.length,
+                                mimeType: imageData.split(',')[0]
+                            });
+                            
+                        } catch (imageError) {
+                            console.error(`Error processing ${fieldName}:`, imageError);
+                            updateProgress(`เกิดข้อผิดพลาดในการประมวลผลรูปภาพ: ${fieldName}`);
+                            
+                            // Show specific error for image processing
+                            Swal.close();
+                            await Swal.fire({
+                                icon: 'error',
+                                title: 'ข้อผิดพลาดในการประมวลผลรูปภาพ',
+                                html: `
+                                    <div class="text-lg">
+                                        <p class="mb-2">❌ ไม่สามารถประมวลผลรูปภาพได้: <strong>${fieldName}</strong></p>
+                                        <p class="text-red-600 font-semibold">กรุณาตรวจสอบไฟล์รูปภาพและลองใหม่</p>
+                                        <p class="text-sm text-gray-600 mt-2">ข้อผิดพลาด: ${imageError.message}</p>
+                                        <div class="mt-3 p-3 bg-blue-50 rounded-lg">
+                                            <p class="text-sm text-blue-800">
+                                                <strong>คำแนะนำ:</strong><br>
+                                                • ใช้ไฟล์รูปภาพ JPG, PNG, GIF หรือ WebP<br>
+                                                • ขนาดไฟล์ไม่เกิน 5MB<br>
+                                                • ตรวจสอบว่าไฟล์ไม่เสียหาย<br>
+                                                • รูปภาพต้องเป็นรูปแบบที่ถูกต้อง
+                                            </p>
+                                        </div>
+                                    </div>
+                                `,
+                                confirmButtonText: 'ตกลง',
+                                confirmButtonColor: '#ef4444'
+                            });
+                            return; // Stop processing
+                        }
+                    }
+                }
 
-                // Set timeout for the entire operation
-                const timeoutPromise = new Promise((_, reject) => {
-                    setTimeout(() => reject(new Error('Timeout')), 30000); // 30 second timeout
+                // Update progress for data sending
+                updateProgress('กำลังส่งข้อมูลไปยัง Google Sheets...');
+                
+                // Debug: Log the data being sent
+                console.log('=== Sending Personnel Data to Google Apps Script ===');
+                console.log('Action:', personnelData.action);
+                console.log('ID Card:', personnelData.idCard);
+                console.log('Full Name:', personnelData.fullName);
+                console.log('Images:', imageFields.filter(field => personnelData[field]).length);
+                console.log('=== End Data Debug ===');
+                
+                // Enhanced POST method with better error handling
+                let response;
+                let responseData = null;
+                let success = false;
+                let attemptCount = 0;
+                const maxAttempts = 3;
+                
+                // Convert data to FormData for POST
+                const formData = new FormData();
+                Object.keys(personnelData).forEach(key => {
+                    if (personnelData[key] !== null && personnelData[key] !== undefined) {
+                        formData.append(key, personnelData[key]);
+                    }
                 });
-
-                // Try to send data with timeout
-                const sendDataPromise = isUpdate ? updateData(data) : sendDataToGoogleSheets(data);
                 
-                await Promise.race([sendDataPromise, timeoutPromise]);
-                
-                // Close loading alert
-                Swal.close();
-                
-                // Store data for editing
-                window.currentData = data;
-                
-                // Mark that we have submitted before (for tracking updates)
-                window.hasSubmittedBefore = true;
-                
-                // Determine if this was an update or create based on the actual operation
-                const wasUpdate = window.hasSubmittedBefore;
-                
-                if (wasUpdate) {
-                    // Show success message for update
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'อัพเดทข้อมูลเรียบร้อย!',
-                        confirmButtonText: 'ตกลง',
-                        confirmButtonColor: '#10b981'
-                    });
-                } else {
-                    // Show success message for new record
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'บันทึกข้อมูลเรียบร้อย!',
-                        confirmButtonText: 'ตกลง',
-                        confirmButtonColor: '#10b981'
-                    });
+                // Primary POST method with retry logic
+                while (attemptCount < maxAttempts && !success) {
+                    attemptCount++;
+                    updateProgress(`กำลังส่งข้อมูล... (ครั้งที่ ${attemptCount}/${maxAttempts})`);
+                    
+                    try {
+                        response = await fetch(SCRIPT_URL, {
+                            method: 'POST',
+                            body: formData
+                        });
+                        
+                        const responseText = await response.text();
+                        console.log(`POST Response (Attempt ${attemptCount}):`, responseText);
+                        
+                        if (responseText.trim()) {
+                            try {
+                                responseData = JSON.parse(responseText);
+                                success = responseData.success === true;
+                                
+                                if (success) {
+                                    updateProgress('บันทึกข้อมูลสำเร็จ!');
+                                    break;
+                                } else if (responseData.message) {
+                                    console.log('Server returned error:', responseData.message);
+                                }
+                            } catch (parseError) {
+                                console.log('Could not parse POST response as JSON:', parseError);
+                                // If response is OK but not JSON, consider it success for simple responses
+                                if (response.ok && (responseText.includes('success') || responseText.includes('สำเร็จ'))) {
+                                    success = true;
+                                    responseData = { success: true, message: 'บันทึกข้อมูลสำเร็จ' };
+                                    break;
+                                }
+                            }
+                        }
+                        
+                        // If not successful and not the last attempt, wait before retry
+                        if (!success && attemptCount < maxAttempts) {
+                            await new Promise(resolve => setTimeout(resolve, 2000));
+                        }
+                        
+                    } catch (postError) {
+                        console.log(`POST attempt ${attemptCount} failed:`, postError);
+                        
+                        if (attemptCount === maxAttempts) {
+                            // Last attempt failed, try JSONP fallback
+                            updateProgress('กำลังลองวิธีการสำรอง...');
+                            
+                            try {
+                                // Prepare data for JSONP (without large images)
+                                const jsonpData = { ...personnelData };
+                                
+                                // Remove large image data for JSONP
+                                imageFields.forEach(field => {
+                                    if (jsonpData[field] && jsonpData[field].length > 1000) {
+                                        delete jsonpData[field];
+                                    }
+                                });
+                                
+                                const dataString = JSON.stringify(jsonpData);
+                                if (dataString.length > 8000) {
+                                    throw new Error('Data too large for JSONP fallback');
+                                }
+                                
+                                const jsonpUrl = SCRIPT_URL + '?' + new URLSearchParams({
+                                    callback: 'handleResponse',
+                                    action: personnelData.action,
+                                    data: dataString
+                                });
+                                
+                                responseData = await new Promise((resolve, reject) => {
+                                    window.handleResponse = resolve;
+                                    const script = document.createElement('script');
+                                    script.src = jsonpUrl;
+                                    script.onerror = reject;
+                                    document.head.appendChild(script);
+                                    
+                                    setTimeout(() => {
+                                        if (script.parentNode) {
+                                            document.head.removeChild(script);
+                                        }
+                                        reject(new Error('JSONP timeout'));
+                                    }, 45000);
+                                });
+                                
+                                success = responseData && responseData.success === true;
+                                if (success) {
+                                    updateProgress('บันทึกข้อมูลสำเร็จ (วิธีการสำรอง)!');
+                                }
+                                
+                            } catch (jsonpError) {
+                                console.error('JSONP fallback also failed:', jsonpError);
+                                throw new Error(`การส่งข้อมูลล้มเหลวทั้ง POST และ JSONP: ${postError.message}`);
+                            }
+                        } else {
+                            // Wait before retry
+                            await new Promise(resolve => setTimeout(resolve, 2000));
+                        }
+                    }
                 }
                 
-                // Change button to update mode for next submission
-                const submitButton = document.querySelector('button[type="submit"]');
-                submitButton.innerHTML = '<i class="fas fa-sync-alt mr-3 animate-spin text-yellow-600"></i>อัพเดทข้อมูล';
-                submitButton.className = 'flex-1 bg-gradient-to-r from-orange-300 to-red-300 hover:from-orange-400 hover:to-red-400 text-black font-semibold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center text-lg shadow-lg';
+                Swal.close();
                 
-                // Show clear form button
-                const clearButton = document.getElementById('clearFormBtn');
-                clearButton.style.display = 'flex';
-                
-                // Set to update mode for future submissions
-                window.isUpdateMode = true;
-                
-                // Don't reset form - keep data for easy editing
-                // Don't clear image previews - keep them visible
+                if (success && responseData && responseData.success) {
+                    // Store data for editing
+                    window.currentData = personnelData;
+                    
+                    // Count successful image uploads
+                    const uploadedImages = imageFields.filter(field => personnelData[field]).length;
+                    
+                    // Show enhanced success message
+                    await Swal.fire({
+                        icon: 'success',
+                        title: isUpdate ? 'อัพเดทข้อมูลสำเร็จ!' : 'บันทึกข้อมูลสำเร็จ!',
+                        html: `
+                            <div class="text-lg space-y-3">
+                                <div class="flex items-center justify-center space-x-2">
+                                    <i class="fas fa-check-circle text-green-500 text-2xl"></i>
+                                    <p class="font-semibold">ข้อมูลได้ถูกบันทึกใน Google Sheets แล้ว</p>
+                                </div>
+                                
+                                ${uploadedImages > 0 ? `
+                                    <div class="flex items-center justify-center space-x-2">
+                                        <i class="fas fa-cloud-upload-alt text-blue-500 text-xl"></i>
+                                        <p>อัปโหลดรูปภาพ ${uploadedImages} ไฟล์สำเร็จ</p>
+                                    </div>
+                                ` : ''}
+                                
+                                <div class="flex items-center justify-center space-x-2">
+                                    <i class="fas fa-google-drive text-yellow-500 text-xl"></i>
+                                    <p>รูปภาพถูกเก็บใน Google Drive แล้ว</p>
+                                </div>
+                                
+                                <div class="mt-4 p-3 bg-green-50 rounded-lg">
+                                    <p class="text-green-800 font-semibold flex items-center justify-center">
+                                        <i class="fas fa-trophy mr-2"></i>
+                                        การดำเนินการเสร็จสิ้นสมบูรณ์!
+                                    </p>
+                                </div>
+                                
+                                <div class="mt-3 text-sm text-gray-600">
+                                    <p><i class="fas fa-info-circle mr-1"></i>รูปภาพได้รับ URL พร้อมแสดงผลทันที</p>
+                                </div>
+                            </div>
+                        `,
+                        confirmButtonText: 'ตกลง',
+                        confirmButtonColor: '#10b981',
+                        timer: 8000,
+                        timerProgressBar: true
+                    });
+                    
+                    if (!isUpdate) {
+                        // Mark that we have submitted before
+                        window.hasSubmittedBefore = true;
+                        
+                        // Change button to update mode
+                        const submitButton = document.querySelector('button[type="submit"]');
+                        submitButton.innerHTML = '<i class="fas fa-sync-alt mr-3 animate-spin text-yellow-600"></i>อัพเดทข้อมูล';
+                        submitButton.className = 'flex-1 bg-gradient-to-r from-orange-300 to-red-300 hover:from-orange-400 hover:to-red-400 text-black font-semibold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center text-lg shadow-lg';
+                        
+                        // Show clear form button
+                        const clearButton = document.getElementById('clearFormBtn');
+                        clearButton.style.display = 'flex';
+                        
+                        // Set to update mode
+                        window.isUpdateMode = true;
+                    }
+                } else {
+                    // Show error message
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'ส่งข้อมูลไม่สำเร็จ',
+                        html: `
+                            <div class="text-lg">
+                                <p class="mb-2">❌ ไม่สามารถบันทึกข้อมูลได้</p>
+                                <p class="text-red-600 font-semibold">กรุณาลองใหม่อีกครั้ง</p>
+                                ${responseData && responseData.message ? `<p class="text-sm text-gray-600 mt-2">ข้อผิดพลาด: ${responseData.message}</p>` : ''}
+                            </div>
+                        `,
+                        confirmButtonText: 'ตกลง',
+                        confirmButtonColor: '#ef4444'
+                    });
+                }
                 
             } catch (error) {
                 console.error('Form submission failed:', error);
                 
-                // Close loading alert
                 Swal.close();
                 
-                Swal.fire({
+                await Swal.fire({
                     icon: 'error',
                     title: 'เกิดข้อผิดพลาด',
-                    text: 'ไม่สามารถบันทึกข้อมูลได้ กรุณาลองใหม่อีกครั้ง',
+                    html: `
+                        <div class="text-lg">
+                            <p class="mb-2">❌ ไม่สามารถส่งข้อมูลได้</p>
+                            <p class="text-red-600 font-semibold">กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตและลองใหม่</p>
+                            <p class="text-sm text-gray-600 mt-2">ข้อผิดพลาด: ${error.message}</p>
+                        </div>
+                    `,
                     confirmButtonText: 'ตกลง',
                     confirmButtonColor: '#ef4444'
                 });
             }
         });
 
-        // Function to send data to Google Sheets - single request only
-        async function sendDataToGoogleSheets(data) {
-            const postData = new FormData();
-            
-            // Check if this ID card already exists (for update vs create)
-            const existingRecord = await checkExistingRecord(data.idCard);
-            
-            if (existingRecord) {
-                postData.append('action', 'update');
-                window.isUpdateMode = true;
-            } else {
-                postData.append('action', 'create');
-                window.isUpdateMode = false;
-            }
-            
-            Object.keys(data).forEach(key => {
-                if (data[key] !== null && data[key] !== undefined && data[key] !== '') {
-                    postData.append(key, data[key]);
-                }
-            });
-
-            // Send single request only
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: postData,
-                mode: 'no-cors'
-            });
-            
-            // Wait a bit to ensure processing
-            await new Promise(resolve => setTimeout(resolve, 2000));
-        }
-
-        // Check if record exists by ID card number
-        async function checkExistingRecord(idCard) {
-            if (!idCard) return false;
-            
-            try {
-                const params = new URLSearchParams();
-                params.append('action', 'checkExists');
-                params.append('idCard', idCard);
-                
-                const response = await fetch(SCRIPT_URL + '?' + params.toString(), {
-                    method: 'GET',
-                    mode: 'no-cors'
-                });
-                
-                // Since we can't read the response in no-cors mode,
-                // we'll assume it exists if this is not the first submission
-                return window.hasSubmittedBefore || false;
-            } catch (error) {
-                console.log('Check existing record failed:', error);
-                return window.hasSubmittedBefore || false;
-            }
-        }
-
-
-
-        // Preview image function - updated to handle multiple previews
+        // Enhanced image preview function
         function previewImage(input, previewId, statusId) {
             const preview = document.getElementById(previewId);
             const status = document.getElementById(statusId);
@@ -863,12 +1389,14 @@
                 const fileSize = file.size;
                 const sizeStatus = getFileSizeStatus(fileSize);
                 
-                // Show file info
+                // Show file info with enhanced styling
                 status.innerHTML = `
-                    <div class="flex items-center space-x-2">
-                        <span>${sizeStatus.color}</span>
-                        <span class="text-gray-700">${formatFileSize(fileSize)}</span>
-                        <span class="text-gray-600">${sizeStatus.text}</span>
+                    <div class="status-indicator ${sizeStatus.class} flex items-center space-x-3">
+                        <span class="text-xl">${sizeStatus.color}</span>
+                        <div>
+                            <div class="font-semibold">${formatFileSize(fileSize)}</div>
+                            <div class="text-sm">${sizeStatus.text}</div>
+                        </div>
                     </div>
                 `;
                 
@@ -877,15 +1405,19 @@
                     const reader = new FileReader();
                     reader.onload = function(e) {
                         preview.innerHTML = `
-                            <img src="${e.target.result}" alt="ตัวอย่างรูปภาพ" class="w-32 h-32 object-cover rounded-lg border-2 border-gray-300 shadow-lg">
+                            <div class="flex justify-center">
+                                <img src="${e.target.result}" alt="ตัวอย่างรูปภาพ" class="image-preview w-40 h-40 object-cover">
+                            </div>
                         `;
                     };
                     reader.readAsDataURL(file);
                 } else {
-                    // Show file icon for non-images (like PDF)
+                    // Show file icon for non-images
                     preview.innerHTML = `
-                        <div class="w-32 h-32 bg-gray-100 rounded-lg border-2 border-gray-300 shadow-lg flex items-center justify-center">
-                            <i class="fas fa-file-pdf text-red-500 text-4xl"></i>
+                        <div class="flex justify-center">
+                            <div class="w-40 h-40 bg-gray-100 rounded-lg border-2 border-gray-300 shadow-lg flex items-center justify-center">
+                                <i class="fas fa-file-pdf text-red-500 text-5xl"></i>
+                            </div>
                         </div>
                     `;
                 }
@@ -893,45 +1425,6 @@
                 preview.innerHTML = '';
                 status.innerHTML = '';
             }
-        }
-
-        // Update data function - single request only
-        async function updateData(data) {
-            // Handle image uploads
-            const imageFields = ['personalImage', 'licenseDocument', 'educationDocument', 'specializedDocument'];
-            
-            for (const fieldName of imageFields) {
-                const fileInput = document.querySelector(`input[name="${fieldName}"]`);
-                if (fileInput && fileInput.files && fileInput.files[0]) {
-                    const imageData = await handleImageUpload(fileInput.files[0]);
-                    data[fieldName] = imageData;
-                }
-            }
-
-            // Use personal image for staff photo as well
-            data.staffPhoto = data.personalImage;
-
-            // Create form data for POST request
-            const postData = new FormData();
-            postData.append('action', 'update');
-            postData.append('idCard', data.idCard); // Use ID card as identifier
-            
-            // Append all data to FormData
-            Object.keys(data).forEach(key => {
-                if (data[key] !== null && data[key] !== undefined && data[key] !== '') {
-                    postData.append(key, data[key]);
-                }
-            });
-
-            // Send single update request only
-            const response = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                body: postData,
-                mode: 'no-cors'
-            });
-
-            // Wait a bit to ensure processing
-            await new Promise(resolve => setTimeout(resolve, 2000));
         }
 
         // Modal functions
@@ -969,52 +1462,20 @@
                 workExperience: 'อายุงาน'
             };
             
-            let content = '';
-            
-            // Show images first if available
-            const imageFields = {
-                personalImage: 'รูปภาพประจำตัว',
-                licenseDocument: 'เอกสารใบประกอบวิชาชีพ',
-                educationDocument: 'เอกสารใบสำเร็จการศึกษา',
-                specializedDocument: 'เอกสารวุฒิบัตร'
-            };
-            
-            let hasImages = false;
-            let imageContent = '<div class="mb-6"><h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center"><i class="fas fa-images text-blue-500 mr-2"></i>เอกสารและรูปภาพ</h3><div class="grid grid-cols-2 md:grid-cols-4 gap-4">';
-            
-            Object.keys(imageFields).forEach(key => {
-                if (data[key] && data[key] !== '' && data[key].startsWith('data:image')) {
-                    hasImages = true;
-                    imageContent += `
-                        <div class="text-center">
-                            <img src="${data[key]}" alt="${imageFields[key]}" class="w-full h-32 object-cover rounded-lg border-2 border-gray-300 shadow-lg mb-2">
-                            <div class="text-xs text-gray-600">${imageFields[key]}</div>
-                        </div>
-                    `;
-                }
-            });
-            
-            imageContent += '</div></div>';
-            
-            if (hasImages) {
-                content += imageContent;
-            }
-            
-            // Show data fields
-            content += '<div class="mb-4"><h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center"><i class="fas fa-info-circle text-emerald-500 mr-2"></i>ข้อมูลส่วนตัว</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
+            let content = '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">';
             
             Object.keys(fieldLabels).forEach(key => {
                 if (data[key] && data[key] !== '') {
                     content += `
-                        <div class="bg-white p-3 rounded-lg border border-pink-200">
-                            <div class="text-sm text-gray-600 font-medium">${fieldLabels[key]}</div>
-                            <div class="text-gray-800">${data[key]}</div>
+                        <div class="bg-white p-4 rounded-xl border-2 border-pink-200 shadow-sm">
+                            <div class="text-sm text-gray-600 font-semibold mb-1">${fieldLabels[key]}</div>
+                            <div class="text-gray-800 font-medium text-lg">${data[key]}</div>
                         </div>
                     `;
                 }
             });
             
-            content += '</div></div>';
+            content += '</div>';
             modalContent.innerHTML = content;
             modal.style.display = 'block';
         }
@@ -1025,7 +1486,6 @@
         
         function editData() {
             if (window.currentData) {
-                // Populate form with current data
                 const form = document.getElementById('staffForm');
                 Object.keys(window.currentData).forEach(key => {
                     const input = form.querySelector(`[name="${key}"]`);
@@ -1034,12 +1494,10 @@
                     }
                 });
                 
-                // Trigger age calculation if birth date exists
                 if (window.currentData.birthDate) {
                     calculateAge();
                 }
                 
-                // Trigger work experience calculation if start date exists
                 if (window.currentData.startWorkDate) {
                     calculateWorkExperience();
                 }
@@ -1110,12 +1568,11 @@
                     
                     // Reset submit button
                     const submitButton = document.querySelector('button[type="submit"]');
-                    submitButton.innerHTML = '<i class="fas fa-save mr-3 animate-bounce text-yellow-600"></i>บันทึกข้อมูล';
-                    submitButton.className = 'flex-1 bg-gradient-to-r from-pink-300 to-purple-300 hover:from-pink-400 hover:to-purple-400 text-black font-semibold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center text-lg shadow-lg';
+                    submitButton.innerHTML = '<i class="fas fa-save mr-4 animate-bounce text-yellow-600 text-xl"></i>บันทึกข้อมูล';
+                    submitButton.className = 'flex-1 btn-primary flex items-center justify-center';
                     
                     // Hide clear button
-                    const clearButton = document.getElementById('clearFormBtn');
-                    clearButton.style.display = 'none';
+                    document.getElementById('clearFormBtn').style.display = 'none';
                     
                     Swal.fire({
                         icon: 'success',
@@ -1133,5 +1590,5 @@
             loadDropdownData();
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'97f025aa81be55a1',t:'MTc1Nzg1NTY2NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98069dcd84957996',t:'MTc1ODA5MTI3MS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
