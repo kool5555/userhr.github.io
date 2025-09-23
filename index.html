@@ -648,16 +648,14 @@
             }
         }
 
-        // Ultra-aggressive image compression for mobile
+        // Enhanced image compression for mobile performance
         function compressImage(file, maxWidth = 600, maxHeight = 450, quality = 0.7) {
             return new Promise((resolve) => {
-                // Detect mobile more accurately
-                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-                
-                // Ultra-small dimensions for mobile to ensure sending works
-                const finalMaxWidth = isMobile ? 200 : maxWidth;
-                const finalMaxHeight = isMobile ? 150 : maxHeight;
-                const finalQuality = isMobile ? 0.3 : quality; // Very low quality for mobile
+                // Mobile-optimized compression settings
+                const isMobile = window.innerWidth <= 768;
+                const finalMaxWidth = isMobile ? Math.min(maxWidth, 400) : maxWidth;
+                const finalMaxHeight = isMobile ? Math.min(maxHeight, 300) : maxHeight;
+                const finalQuality = isMobile ? Math.min(quality, 0.6) : quality;
                 
                 const canvas = document.createElement('canvas');
                 const ctx = canvas.getContext('2d');
@@ -666,7 +664,7 @@
                 img.onload = function() {
                     let { width, height } = img;
                     
-                    // Calculate new dimensions maintaining aspect ratio
+                    // Calculate new dimensions
                     const aspectRatio = width / height;
                     
                     if (width > height) {
@@ -691,30 +689,18 @@
                         width = height * aspectRatio;
                     }
                     
-                    // Round dimensions to avoid fractional pixels
-                    width = Math.round(width);
-                    height = Math.round(height);
-                    
                     canvas.width = width;
                     canvas.height = height;
                     
-                    // Optimize canvas settings for mobile
+                    // Use better image smoothing for mobile
                     ctx.imageSmoothingEnabled = true;
-                    ctx.imageSmoothingQuality = 'low'; // Use low quality for faster processing
-                    
-                    // Fill with white background to reduce file size
-                    ctx.fillStyle = '#FFFFFF';
-                    ctx.fillRect(0, 0, width, height);
+                    ctx.imageSmoothingQuality = isMobile ? 'medium' : 'high';
                     
                     ctx.drawImage(img, 0, 0, width, height);
                     
-                    // Always use JPEG for maximum compression
-                    canvas.toBlob(resolve, 'image/jpeg', finalQuality);
-                };
-                
-                img.onerror = function() {
-                    console.error('Image loading failed');
-                    resolve(null);
+                    // Use webp for better compression on supported browsers
+                    const outputFormat = 'image/jpeg'; // Keep JPEG for compatibility
+                    canvas.toBlob(resolve, outputFormat, finalQuality);
                 };
                 
                 img.src = URL.createObjectURL(file);
@@ -923,7 +909,7 @@
             }
         }
 
-        // Ultra-optimized image upload for mobile with size limits
+        // Enhanced mobile-optimized image upload function
         async function handleImageUpload(file) {
             if (!file) return '';
             
@@ -932,110 +918,86 @@
                 validateImageFile(file);
                 
                 const originalSize = file.size;
-                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-                
-                console.log(`📱 Processing image (Mobile: ${isMobile}):`, {
-                    originalSize: formatFileSize(originalSize),
-                    fileName: file.name
-                });
-                
                 let compressedFile = file;
                 
-                // Always compress images on mobile, regardless of size
-                if (isMobile) {
-                    console.log('📱 Applying mobile compression...');
+                // Mobile-optimized compression thresholds
+                const isMobile = window.innerWidth <= 768;
+                const compressionThreshold = isMobile ? 300000 : 800000; // 300KB for mobile, 800KB for desktop
+                const maxFinalSize = isMobile ? 500000 : 1500000; // 500KB for mobile, 1.5MB for desktop
+                
+                // Compress if file is too large
+                if (file.size > compressionThreshold) {
+                    const maxWidth = isMobile ? 400 : 800;
+                    const maxHeight = isMobile ? 300 : 600;
+                    const quality = isMobile ? 0.6 : 0.7;
                     
-                    // Ultra-aggressive compression for mobile
-                    compressedFile = await compressImage(file, 200, 150, 0.3);
+                    compressedFile = await compressImage(file, maxWidth, maxHeight, quality);
                     
-                    if (!compressedFile) {
-                        throw new Error('ไม่สามารถบีบอัดรูปภาพได้');
-                    }
-                    
-                    // If still too large, compress even more
-                    if (compressedFile.size > 50000) { // 50KB limit for mobile
-                        console.log('📱 File still too large, applying extra compression...');
-                        compressedFile = await compressImage(file, 150, 100, 0.2);
-                    }
-                    
-                    // Final check - if still too large, compress to minimum
-                    if (compressedFile && compressedFile.size > 80000) { // 80KB absolute limit
-                        console.log('📱 Applying final compression...');
-                        compressedFile = await compressImage(file, 100, 75, 0.1);
-                    }
-                    
-                } else {
-                    // Desktop compression (less aggressive)
-                    if (file.size > 800000) { // 800KB
-                        compressedFile = await compressImage(file, 800, 600, 0.7);
+                    // If still too large, compress more aggressively
+                    if (compressedFile.size > maxFinalSize) {
+                        const aggressiveWidth = isMobile ? 300 : 600;
+                        const aggressiveHeight = isMobile ? 225 : 450;
+                        const aggressiveQuality = isMobile ? 0.4 : 0.5;
+                        
+                        compressedFile = await compressImage(file, aggressiveWidth, aggressiveHeight, aggressiveQuality);
                     }
                 }
                 
-                if (!compressedFile) {
-                    throw new Error('ไม่สามารถประมวลผลรูปภาพได้');
-                }
-                
-                console.log(`📱 Compression complete:`, {
-                    originalSize: formatFileSize(originalSize),
-                    compressedSize: formatFileSize(compressedFile.size),
-                    compressionRatio: ((originalSize - compressedFile.size) / originalSize * 100).toFixed(1) + '%'
-                });
-                
-                // Convert to base64 with mobile optimization
+                // Convert to base64 with proper MIME type matching GS format
                 return new Promise((resolve, reject) => {
                     const reader = new FileReader();
-                    
-                    // Shorter timeout for mobile
-                    const timeout = setTimeout(() => {
-                        reader.abort();
-                        reject(new Error('การประมวลผลรูปภาพใช้เวลานานเกินไป'));
-                    }, isMobile ? 8000 : 30000); // 8s for mobile, 30s for desktop
-                    
                     reader.onload = function(e) {
-                        clearTimeout(timeout);
                         const result = e.target.result;
                         
-                        // Validate base64 result
-                        if (!result || typeof result !== 'string' || !result.startsWith('data:image/')) {
+                        // Validate base64 format to match GS expectations
+                        if (!result || !result.includes('data:') || !result.includes(',')) {
                             reject(new Error('รูปแบบ base64 ไม่ถูกต้อง'));
                             return;
                         }
                         
-                        // Extract base64 content for size check
-                        const base64Content = result.split(',')[1];
+                        // Use regex matching exactly like GS code
+                        const matches = result.match(/^data:([^;]+);base64,(.+)$/);
+                        if (!matches) {
+                            reject(new Error('ไม่สามารถแยก MIME type ได้'));
+                            return;
+                        }
+                        
+                        const mimeType = matches[1];
+                        const base64Content = matches[2];
+                        
+                        // Validate MIME type
+                        const validMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                        if (!validMimeTypes.includes(mimeType)) {
+                            reject(new Error('รูปแบบไฟล์ไม่รองรับ: ' + mimeType));
+                            return;
+                        }
+                        
+                        // Validate base64 content
                         if (!base64Content || base64Content.length === 0) {
                             reject(new Error('ข้อมูลรูปภาพว่างเปล่า'));
                             return;
                         }
                         
-                        // Check final base64 size (mobile limit: ~67KB base64 = ~50KB binary)
-                        const base64Size = base64Content.length;
-                        const estimatedBinarySize = (base64Size * 3) / 4;
+                        // Check final size for mobile optimization
+                        const finalSizeEstimate = (base64Content.length * 3) / 4; // Rough base64 to bytes conversion
                         
-                        if (isMobile && estimatedBinarySize > 100000) { // 100KB limit for mobile
-                            reject(new Error(`รูปภาพยังใหญ่เกินไป (${formatFileSize(estimatedBinarySize)}) กรุณาใช้รูปภาพที่เล็กกว่า`));
-                            return;
-                        }
-                        
-                        console.log(`📱 Base64 conversion complete:`, {
-                            base64Length: base64Size,
-                            estimatedSize: formatFileSize(estimatedBinarySize),
-                            mobile: isMobile
+                        console.log(`📱 Image processed (Mobile: ${isMobile}):`, {
+                            mimeType,
+                            originalSize: formatFileSize(originalSize),
+                            compressedSize: formatFileSize(compressedFile.size),
+                            base64Length: base64Content.length,
+                            estimatedFinalSize: formatFileSize(finalSizeEstimate)
                         });
                         
                         resolve(result);
                     };
                     
-                    reader.onerror = () => {
-                        clearTimeout(timeout);
-                        reject(new Error('ไม่สามารถอ่านไฟล์ได้'));
-                    };
-                    
+                    reader.onerror = () => reject(new Error('ไม่สามารถอ่านไฟล์ได้'));
                     reader.readAsDataURL(compressedFile);
                 });
                 
             } catch (error) {
-                console.error('📱 Image upload error:', error);
+                console.error('Image upload error:', error);
                 throw error;
             }
         }
@@ -1047,20 +1009,18 @@
             return `${fieldName}_${timestamp}.${extension}`;
         }
 
-        // Enhanced form submission with mobile detection and timeout
+        // Enhanced form submission compatible with GS handleUpdatePersonnel
         document.getElementById('staffForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const isUpdate = window.isUpdateMode || false;
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
             
-            // Show loading with mobile-specific timeout warning
+            // Show simple loading alert
             Swal.fire({
                 title: isUpdate ? 'กำลังอัพเดทข้อมูล...' : 'กำลังบันทึกข้อมูล...',
                 html: `
                     <div class="flex flex-col items-center space-y-4">
                         <div class="loading-spinner"></div>
-                        ${isMobile ? '<p class="text-sm text-gray-600 mt-2">📱 กำลังประมวลผลสำหรับมือถือ...</p>' : ''}
                     </div>
                 `,
                 allowOutsideClick: false,
@@ -1069,24 +1029,6 @@
                     Swal.showLoading();
                 }
             });
-            
-            // Set overall timeout for mobile devices
-            const overallTimeout = setTimeout(() => {
-                Swal.close();
-                Swal.fire({
-                    icon: 'error',
-                    title: 'การส่งข้อมูลใช้เวลานานเกินไป',
-                    html: `
-                        <div class="text-lg">
-                            <p class="mb-2">⏰ การส่งข้อมูลใช้เวลานานเกินกำหนด</p>
-                            <p class="text-red-600 font-semibold">กรุณาตรวจสอบสัญญาณอินเทอร์เน็ตและลองใหม่</p>
-                            ${isMobile ? '<p class="text-sm text-blue-600 mt-2">💡 ลองลดขนาดรูปภาพหรือลบรูปภาพออกชั่วคราว</p>' : ''}
-                        </div>
-                    `,
-                    confirmButtonText: 'ตกลง',
-                    confirmButtonColor: '#ef4444'
-                });
-            }, isMobile ? 60000 : 120000); // 1 minute for mobile, 2 minutes for desktop
             
             try {
                 const originalFormData = new FormData(this);
@@ -1195,7 +1137,7 @@
                     }
                 }
 
-                // Send data to Google Sheets with mobile optimization
+                // Send data to Google Sheets
                 console.log('=== Sending Personnel Data to Google Apps Script ===');
                 console.log('Action:', personnelData.action);
                 console.log('ID Card:', personnelData.idCard);
@@ -1203,138 +1145,45 @@
                 console.log('Images:', imageFields.filter(field => personnelData[field]).length);
                 console.log('=== End Data Debug ===');
                 
-                // Detect mobile for different sending strategies
-                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+                // Convert data to FormData for POST
+                const formData = new FormData();
+                Object.keys(personnelData).forEach(key => {
+                    if (personnelData[key] !== null && personnelData[key] !== undefined) {
+                        formData.append(key, personnelData[key]);
+                    }
+                });
                 
+                // Send data to Google Apps Script
                 let responseData = null;
                 let success = false;
                 
-                // Mobile-optimized sending with image separation strategy
-                if (isMobile) {
-                    console.log('📱 Using mobile-optimized sending strategy');
-                    
-                    // Check if we have images
-                    const hasImages = imageFields.some(field => personnelData[field]);
-                    
-                    if (hasImages) {
-                        console.log('📱 Images detected - using text-first strategy');
-                        
-                        // Strategy 1: Send text data first without images
-                        const textOnlyData = { ...personnelData };
-                        imageFields.forEach(field => {
-                            delete textOnlyData[field];
-                            delete textOnlyData[field + '_filename'];
-                        });
-                        
-                        try {
-                            console.log('📱 Sending text data only...');
-                            const textResponse = await fetch(SCRIPT_URL, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify(textOnlyData)
-                            });
-                            
-                            if (textResponse.ok) {
-                                const responseText = await textResponse.text();
-                                console.log('📱 Text-only response:', responseText);
-                                
-                                if (responseText.trim()) {
-                                    try {
-                                        responseData = JSON.parse(responseText);
-                                        success = responseData.success === true;
-                                    } catch (parseError) {
-                                        if (responseText.includes('success') || responseText.includes('สำเร็จ')) {
-                                            success = true;
-                                            responseData = { success: true, message: 'บันทึกข้อมูลสำเร็จ (ข้อความเท่านั้น)' };
-                                        }
-                                    }
-                                }
-                            }
-                        } catch (textError) {
-                            console.log('📱 Text-only sending failed:', textError);
-                        }
-                        
-                        // If text-only succeeded, show warning about images
-                        if (success) {
-                            console.log('📱 Text data saved successfully, skipping images for mobile compatibility');
-                            responseData.message = 'บันทึกข้อมูลสำเร็จ (รูปภาพถูกข้ามเพื่อความเสถียรบนมือถือ)';
-                        }
-                        
-                    } else {
-                        // No images - send normally
-                        try {
-                            const jsonResponse = await fetch(SCRIPT_URL, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify(personnelData)
-                            });
-                            
-                            if (jsonResponse.ok) {
-                                const responseText = await jsonResponse.text();
-                                console.log('📱 JSON POST Response:', responseText);
-                                
-                                if (responseText.trim()) {
-                                    try {
-                                        responseData = JSON.parse(responseText);
-                                        success = responseData.success === true;
-                                    } catch (parseError) {
-                                        if (responseText.includes('success') || responseText.includes('สำเร็จ')) {
-                                            success = true;
-                                            responseData = { success: true, message: 'บันทึกข้อมูลสำเร็จ' };
-                                        }
-                                    }
-                                }
-                            }
-                        } catch (jsonError) {
-                            console.log('📱 JSON POST failed:', jsonError);
-                            throw new Error(`การส่งข้อมูลล้มเหลว: ${jsonError.message}`);
-                        }
-                    }
-                    
-                } else {
-                    // Desktop strategy: Use FormData as before
-                    console.log('💻 Using desktop sending strategy');
-                    
-                    const formData = new FormData();
-                    Object.keys(personnelData).forEach(key => {
-                        if (personnelData[key] !== null && personnelData[key] !== undefined) {
-                            formData.append(key, personnelData[key]);
-                        }
+                try {
+                    const response = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: formData
                     });
                     
-                    try {
-                        const response = await fetch(SCRIPT_URL, {
-                            method: 'POST',
-                            body: formData
-                        });
-                        
-                        const responseText = await response.text();
-                        console.log('💻 POST Response:', responseText);
-                        
-                        if (responseText.trim()) {
-                            try {
-                                responseData = JSON.parse(responseText);
-                                success = responseData.success === true;
-                            } catch (parseError) {
-                                console.log('Could not parse POST response as JSON:', parseError);
-                                if (response.ok && (responseText.includes('success') || responseText.includes('สำเร็จ'))) {
-                                    success = true;
-                                    responseData = { success: true, message: 'บันทึกข้อมูลสำเร็จ' };
-                                }
+                    const responseText = await response.text();
+                    console.log('POST Response:', responseText);
+                    
+                    if (responseText.trim()) {
+                        try {
+                            responseData = JSON.parse(responseText);
+                            success = responseData.success === true;
+                        } catch (parseError) {
+                            console.log('Could not parse POST response as JSON:', parseError);
+                            // If response is OK but not JSON, consider it success for simple responses
+                            if (response.ok && (responseText.includes('success') || responseText.includes('สำเร็จ'))) {
+                                success = true;
+                                responseData = { success: true, message: 'บันทึกข้อมูลสำเร็จ' };
                             }
                         }
-                    } catch (postError) {
-                        console.error('💻 POST failed:', postError);
-                        throw new Error(`การส่งข้อมูลล้มเหลว: ${postError.message}`);
                     }
+                } catch (postError) {
+                    console.error('POST failed:', postError);
+                    throw new Error(`การส่งข้อมูลล้มเหลว: ${postError.message}`);
                 }
                 
-                // Clear the timeout since we got a response
-                clearTimeout(overallTimeout);
                 Swal.close();
                 
                 if (success && responseData && responseData.success) {
@@ -1343,34 +1192,15 @@
                     
                     // Count successful image uploads
                     const uploadedImages = imageFields.filter(field => personnelData[field]).length;
-                    const hasImages = imageFields.some(field => originalFormData.get(field) && originalFormData.get(field).size > 0);
                     
-                    // Show success message with mobile image warning if applicable
-                    let successMessage = 'ข้อมูลได้ถูกบันทึกเรียบร้อยแล้ว';
-                    let successHtml = successMessage;
-                    
-                    if (isMobile && hasImages && responseData.message && responseData.message.includes('ข้ามเพื่อความเสถียร')) {
-                        successHtml = `
-                            <div class="text-lg">
-                                <p class="mb-3">✅ บันทึกข้อมูลข้อความสำเร็จ!</p>
-                                <div class="bg-orange-50 border border-orange-200 rounded-lg p-3 mb-3">
-                                    <p class="text-orange-800 font-semibold text-sm">
-                                        📱 <strong>หมายเหตุสำหรับมือถือ:</strong><br>
-                                        รูปภาพถูกข้ามเพื่อความเสถียรในการส่งข้อมูล<br>
-                                        กรุณาใช้คอมพิวเตอร์สำหรับอัปโหลดรูปภาพ
-                                    </p>
-                                </div>
-                            </div>
-                        `;
-                    }
-                    
+                    // Show simple success message
                     await Swal.fire({
                         icon: 'success',
                         title: isUpdate ? 'อัพเดทข้อมูลสำเร็จ!' : 'บันทึกข้อมูลสำเร็จ!',
-                        html: successHtml,
+                        text: 'ข้อมูลได้ถูกบันทึกเรียบร้อยแล้ว',
                         confirmButtonText: 'ตกลง',
                         confirmButtonColor: '#10b981',
-                        timer: isMobile && hasImages ? 5000 : 3000,
+                        timer: 3000,
                         timerProgressBar: true
                     });
                     
@@ -1410,8 +1240,6 @@
             } catch (error) {
                 console.error('Form submission failed:', error);
                 
-                // Clear timeout on error
-                clearTimeout(overallTimeout);
                 Swal.close();
                 
                 await Swal.fire({
@@ -1636,96 +1464,10 @@
             });
         }
 
-        // Network status detection for mobile
-        function checkNetworkStatus() {
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-            
-            if (isMobile && 'connection' in navigator) {
-                const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
-                
-                if (connection) {
-                    console.log('📱 Network Info:', {
-                        effectiveType: connection.effectiveType,
-                        downlink: connection.downlink,
-                        rtt: connection.rtt
-                    });
-                    
-                    // Warn about slow connections
-                    if (connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g') {
-                        Swal.fire({
-                            icon: 'warning',
-                            title: 'สัญญาณอินเทอร์เน็ตช้า',
-                            html: `
-                                <div class="text-lg">
-                                    <p class="mb-2">📶 ตรวจพบสัญญาณอินเทอร์เน็ตช้า</p>
-                                    <p class="text-orange-600 font-semibold">การส่งข้อมูลอาจใช้เวลานานกว่าปกติ</p>
-                                    <div class="mt-3 p-3 bg-blue-50 rounded-lg">
-                                        <p class="text-sm text-blue-800">
-                                            <strong>คำแนะนำ:</strong><br>
-                                            • หาจุดที่มีสัญญาณแรงกว่า<br>
-                                            • ลองใช้ WiFi แทน 4G/5G<br>
-                                            • ลดขนาดรูปภาพก่อนอัปโหลด
-                                        </p>
-                                    </div>
-                                </div>
-                            `,
-                            confirmButtonText: 'เข้าใจแล้ว',
-                            confirmButtonColor: '#f59e0b'
-                        });
-                    }
-                }
-            }
-        }
-
-        // Show mobile usage tips
-        function showMobileTips() {
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-            
-            if (isMobile) {
-                // Show tips after a delay
-                setTimeout(() => {
-                    Swal.fire({
-                        icon: 'info',
-                        title: '📱 คำแนะนำสำหรับมือถือ',
-                        html: `
-                            <div class="text-left">
-                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                                    <h4 class="font-semibold text-blue-800 mb-2">💡 เคล็ดลับการใช้งาน:</h4>
-                                    <ul class="text-sm text-blue-700 space-y-1">
-                                        <li>• <strong>ข้อมูลข้อความ:</strong> สามารถบันทึกได้ปกติ</li>
-                                        <li>• <strong>รูปภาพ:</strong> แนะนำใช้คอมพิวเตอร์เพื่อความเสถียร</li>
-                                        <li>• <strong>สัญญาณ:</strong> ตรวจสอบให้แรงก่อนส่งข้อมูล</li>
-                                        <li>• <strong>ขนาดรูป:</strong> ใช้รูปเล็กๆ หากจำเป็นต้องอัปโหลด</li>
-                                    </ul>
-                                </div>
-                                <p class="text-sm text-gray-600">
-                                    หากมีปัญหาการส่งข้อมูล กรุณาลองใช้คอมพิวเตอร์แทน
-                                </p>
-                            </div>
-                        `,
-                        confirmButtonText: 'เข้าใจแล้ว',
-                        confirmButtonColor: '#3b82f6',
-                        showClass: {
-                            popup: 'animate__animated animate__fadeInDown'
-                        },
-                        hideClass: {
-                            popup: 'animate__animated animate__fadeOutUp'
-                        }
-                    });
-                }, 3000);
-            }
-        }
-
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             loadDropdownData();
-            
-            // Check network status on mobile
-            setTimeout(checkNetworkStatus, 2000);
-            
-            // Show mobile tips
-            showMobileTips();
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98075d84016d7994',t:'MTc1ODA5OTEyNC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98387f23e2a47dbb',t:'MTc1ODYxNDMwMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
