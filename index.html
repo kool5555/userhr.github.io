@@ -1469,28 +1469,5 @@
             loadDropdownData();
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'98387f23e2a47dbb',t:'MTc1ODYxNDMwMy4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
-<script>
-      function submitPersonnel() {
-        // ดึงข้อมูลจากฟอร์ม
-        var form = document.getElementById('personnelForm');
-        var formData = new FormData(form);
-        var data = {};
-        formData.forEach((value, key) => { data[key] = value });
-
-        // เรียก Apps Script function
-        google.script.run
-          .withSuccessHandler(function(response) {
-            // ทำงานกับ response เช่น แสดงผล
-            console.log(response);
-            alert(response.message); // แจ้งผลลัพธ์
-          })
-          .withFailureHandler(function(error) {
-            // แจ้ง error
-            alert(error.message);
-          })
-          .handleAddPersonnel(data); // ฟังก์ชันฝั่ง Apps Script
-      }
-    </script>
-    </body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'983ecf2ff4352dcc',t:'MTc1ODY4MDQ5Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
