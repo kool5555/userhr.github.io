@@ -569,7 +569,7 @@
 
     <script>
         // Configuration - ตรงกับโค้ด GS ของคุณ
-        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwettDCjvdFPKV4dk_Kl0zwzN7kIVfchsmKgIEAwcQNgWIZyrU6Ecb8RQrjyBx3IAg57A/exec';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyyOMbDhvb0cCpuI2tS5tLbZ54JwhK6H6nhW83IddLPBhS_4FnbhINEK69IhKbyfQE57A/exec';
         const SHEET_ID = '1COt-ehxsy2b8B7zomUozR9Qpuo6j09rsGKSlaGABQro';
         const SHEET_NAME = 'ชีต1';
         const FOLDER_ID = '1TUm9g7DgHvy9sRsjuya-gK3D1TjqPgm_';
@@ -1009,23 +1009,51 @@
             return `${fieldName}_${timestamp}.${extension}`;
         }
 
-// ========== Form submit ==========
+        // Enhanced form submission compatible with GS handleUpdatePersonnel
         document.getElementById('staffForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-
+            
+            const isUpdate = window.isUpdateMode || false;
+            
+            // Show simple loading alert
             Swal.fire({
-                title: window.isUpdateMode ? 'กำลังอัพเดทข้อมูล...' : 'กำลังบันทึกข้อมูล...',
-                html: `<div class="flex flex-col items-center space-y-4"><div class="loading-spinner"></div></div>`,
-                allowOutsideClick: false, showConfirmButton: false,
-                didOpen: () => { Swal.showLoading(); }
+                title: isUpdate ? 'กำลังอัพเดทข้อมูล...' : 'กำลังบันทึกข้อมูล...',
+                html: `
+                    <div class="flex flex-col items-center space-y-4">
+                        <div class="loading-spinner"></div>
+                    </div>
+                `,
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
             });
-
+            
             try {
-                const form = this;
-                const originalFormData = new FormData(form);
-                // เตรียมข้อมูล
+                const originalFormData = new FormData(this);
+                
+                // Handle image uploads with progress tracking
+                const imageFields = ['personalImage', 'licenseDocument', 'educationDocument', 'specializedDocument'];
+                let imageCount = 0;
+                let processedImages = 0;
+                
+                // Count total images to process
+                for (const fieldName of imageFields) {
+                    const imageFile = originalFormData.get(fieldName);
+                    if (imageFile && imageFile.size > 0) {
+                        imageCount++;
+                    }
+                }
+                
+                // Update progress (simplified)
+                const updateProgress = (message) => {
+                    // Progress updates removed for cleaner UI
+                };
+                
+                // Prepare data object for GS handleUpdatePersonnel format
                 const personnelData = {
-                    action: window.isUpdateMode ? 'update' : 'create',
+                    action: isUpdate ? 'updatePersonnel' : 'addPersonnel',
                     originalIdCard: window.currentData?.idCard || originalFormData.get('idCard'),
                     idCard: originalFormData.get('idCard') || '',
                     department: originalFormData.get('department') || '',
@@ -1056,64 +1084,58 @@
                     workAge: originalFormData.get('workExperience') || '',
                     licenseExpiryDate: originalFormData.get('licenseExpiry') || ''
                 };
-                // สร้าง FormData สำหรับส่ง (รองรับการแนบไฟล์)
-                const formData = new FormData();
-                Object.keys(personnelData).forEach(key => formData.append(key, personnelData[key]));
-                ['personalImage', 'licenseDocument', 'educationDocument', 'specializedDocument'].forEach(fieldName => {
-                    const file = originalFormData.get(fieldName);
-                    if (file && file.size > 0) formData.append(fieldName, file);
-                });
-
-                const response = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
-                const responseText = await response.text();
-                let responseData = null;
-                let success = false;
-                try {
-                    responseData = JSON.parse(responseText);
-                    success = responseData.success === true;
-                } catch (parseError) {
-                    success = response.ok && (responseText.includes('success') || responseText.includes('สำเร็จ'));
-                }
-                Swal.close();
-                if (success) {
-                    window.currentData = personnelData;
-                    await Swal.fire({
-                        icon: 'success',
-                        title: window.isUpdateMode ? 'อัพเดทข้อมูลสำเร็จ!' : 'บันทึกข้อมูลสำเร็จ!',
-                        text: 'ข้อมูลได้ถูกบันทึกเรียบร้อยแล้ว',
-                        confirmButtonText: 'ตกลง',
-                        confirmButtonColor: '#10b981',
-                        timer: 3000,
-                        timerProgressBar: true
-                    });
-                    if (!window.isUpdateMode) {
-                        window.hasSubmittedBefore = true;
-                        document.querySelector('button[type="submit"]').innerHTML = '<i class="fas fa-sync-alt mr-3 animate-spin text-yellow-600"></i>อัพเดทข้อมูล';
-                        document.querySelector('button[type="submit"]').className = 'flex-1 bg-gradient-to-r from-orange-300 to-red-300 hover:from-orange-400 hover:to-red-400 text-black font-semibold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center text-lg shadow-lg';
-                        document.getElementById('clearFormBtn').style.display = 'flex';
-                        window.isUpdateMode = true;
+                
+                // Process images
+                for (const fieldName of imageFields) {
+                    const imageFile = originalFormData.get(fieldName);
+                    if (imageFile && imageFile.size > 0) {
+                        try {
+                            // Process image with proper base64 encoding for GS
+                            const imageData = await handleImageUpload(imageFile);
+                            
+                            // Add image data to personnel data object
+                            personnelData[fieldName] = imageData;
+                            personnelData[fieldName + '_filename'] = generateImageFilename(fieldName, imageFile.name);
+                            
+                            processedImages++;
+                            
+                            console.log(`Image ${fieldName} prepared for GS:`, {
+                                filename: personnelData[fieldName + '_filename'],
+                                dataLength: imageData.length,
+                                mimeType: imageData.split(',')[0]
+                            });
+                            
+                        } catch (imageError) {
+                            console.error(`Error processing ${fieldName}:`, imageError);
+                            
+                            // Show specific error for image processing
+                            Swal.close();
+                            await Swal.fire({
+                                icon: 'error',
+                                title: 'ข้อผิดพลาดในการประมวลผลรูปภาพ',
+                                html: `
+                                    <div class="text-lg">
+                                        <p class="mb-2">❌ ไม่สามารถประมวลผลรูปภาพได้: <strong>${fieldName}</strong></p>
+                                        <p class="text-red-600 font-semibold">กรุณาตรวจสอบไฟล์รูปภาพและลองใหม่</p>
+                                        <p class="text-sm text-gray-600 mt-2">ข้อผิดพลาด: ${imageError.message}</p>
+                                        <div class="mt-3 p-3 bg-blue-50 rounded-lg">
+                                            <p class="text-sm text-blue-800">
+                                                <strong>คำแนะนำ:</strong><br>
+                                                • ใช้ไฟล์รูปภาพ JPG, PNG, GIF หรือ WebP<br>
+                                                • ขนาดไฟล์ไม่เกิน 5MB<br>
+                                                • ตรวจสอบว่าไฟล์ไม่เสียหาย<br>
+                                                • รูปภาพต้องเป็นรูปแบบที่ถูกต้อง
+                                            </p>
+                                        </div>
+                                    </div>
+                                `,
+                                confirmButtonText: 'ตกลง',
+                                confirmButtonColor: '#ef4444'
+                            });
+                            return; // Stop processing
+                        }
                     }
-                } else {
-                    await Swal.fire({
-                        icon: 'error',
-                        title: 'ส่งข้อมูลไม่สำเร็จ',
-                        html: `<div class="text-lg"><p class="mb-2">❌ ไม่สามารถบันทึกข้อมูลได้</p><p class="text-red-600 font-semibold">กรุณาลองใหม่อีกครั้ง</p>${responseData && responseData.message ? `<p class="text-sm text-gray-600 mt-2">ข้อผิดพลาด: ${responseData.message}</p>` : ''}</div>`,
-                        confirmButtonText: 'ตกลง',
-                        confirmButtonColor: '#ef4444'
-                    });
                 }
-            } catch (error) {
-                Swal.close();
-                await Swal.fire({
-                    icon: 'error',
-                    title: 'เกิดข้อผิดพลาด',
-                    html: `<div class="text-lg"><p class="mb-2">❌ ไม่สามารถส่งข้อมูลได้</p><p class="text-red-600 font-semibold">กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตและลองใหม่</p><p class="text-sm text-gray-600 mt-2">ข้อผิดพลาด: ${error.message}</p></div>`,
-                    confirmButtonText: 'ตกลง',
-                    confirmButtonColor: '#ef4444'
-                });
-            }
-        });
-
 
                 // Send data to Google Sheets
                 console.log('=== Sending Personnel Data to Google Apps Script ===');
@@ -1447,5 +1469,5 @@
             loadDropdownData();
         });
     </script>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'983ecf2ff4352dcc',t:'MTc1ODY4MDQ5Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'983f79bb85cb2dd4',t:'MTc1ODY4NzQ4Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
