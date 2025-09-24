@@ -1014,7 +1014,15 @@
             e.preventDefault();
             
             const isUpdate = window.isUpdateMode || false;
-            
+            const personnelData = {
+    action: isUpdate ? 'update' : 'create',
+    // ...
+};
+fetch(SCRIPT_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(personnelData)
+})
             // Show simple loading alert
             Swal.fire({
                 title: isUpdate ? 'กำลังอัพเดทข้อมูล...' : 'กำลังบันทึกข้อมูล...',
