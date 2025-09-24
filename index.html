@@ -566,373 +566,908 @@
             </div>
         </div>
     </div>
+
     <script>
-    <script>
-    // CONFIG
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwettDCjvdFPKV4dk_Kl0zwzN7kIVfchsmKgIEAwcQNgWIZyrU6Ecb8RQrjyBx3IAg57A/exec';
-
-    let dropdownData = {
-        departments: [],
-        positions: [],
-        positionLevels: [],
-        positionTypes: [],
-        positionExpertise: [],
-        education: [],
-        workTypes: []
-    };
-
-    // ========== ฟังก์ชัน dropdown ==========
-    async function loadDropdownData() {
-        try {
-            // fetch dropdown จาก GAS
-            const response = await fetch(SCRIPT_URL + '?action=getDropdownData');
-            const data = await response.json();
-            if (data.success) dropdownData = data.data;
-        } catch (e) {
-            dropdownData = {};
-        }
-        populateDropdowns();
-    }
-    function populateDropdowns() {
-        // department
-        const departmentSelect = document.querySelector('select[name="department"]');
-        if (departmentSelect) {
-            departmentSelect.innerHTML = '<option value="">เลือกหน่วยงาน</option>';
-            (dropdownData.departments || []).forEach(dept => {
-                departmentSelect.innerHTML += `<option value="${dept}">${dept}</option>`;
-            });
-        }
-        // position
-        const positionSelect = document.querySelector('select[name="position"]');
-        if (positionSelect) {
-            positionSelect.innerHTML = '<option value="">เลือกตำแหน่ง</option>';
-            (dropdownData.positions || []).forEach(pos => {
-                positionSelect.innerHTML += `<option value="${pos}">${pos}</option>`;
-            });
-        }
-        // positionLevel
-        const positionLevelSelect = document.querySelector('select[name="positionLevel"]');
-        if (positionLevelSelect) {
-            positionLevelSelect.innerHTML = '<option value="">เลือกระดับตำแหน่ง</option>';
-            (dropdownData.positionLevels || []).forEach(level => {
-                positionLevelSelect.innerHTML += `<option value="${level}">${level}</option>`;
-            });
-        }
-        // positionType
-        const positionTypeSelect = document.querySelector('select[name="positionType"]');
-        if (positionTypeSelect) {
-            positionTypeSelect.innerHTML = '<option value="">เลือกประเภทตำแหน่ง</option>';
-            (dropdownData.positionTypes || []).forEach(type => {
-                positionTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
-            });
-        }
-        // expertise
-        const expertiseSelect = document.querySelector('select[name="expertise"]');
-        if (expertiseSelect) {
-            expertiseSelect.innerHTML = '<option value="">เลือกด้านความชำนาญ</option>';
-            (dropdownData.positionExpertise || []).forEach(exp => {
-                expertiseSelect.innerHTML += `<option value="${exp}">${exp}</option>`;
-            });
-        }
-        // educationLevel
-        const educationSelect = document.querySelector('select[name="educationLevel"]');
-        if (educationSelect) {
-            educationSelect.innerHTML = '<option value="">เลือกระดับการศึกษา</option>';
-            (dropdownData.education || []).forEach(edu => {
-                educationSelect.innerHTML += `<option value="${edu}">${edu}</option>`;
-            });
-        }
-    }
-
-    // ========== ฟังก์ชัน preview ==========
-    function previewImage(input, previewId, statusId) {
-        const preview = document.getElementById(previewId);
-        const status = document.getElementById(statusId);
-        if (input.files && input.files[0]) {
-            const file = input.files[0];
-            const fileSize = file.size;
-            let color = '🟢', klass = 'bg-green-100 text-green-800', text = 'ไฟล์ขนาดเหมาะสม';
-            if (fileSize >= 1000000) { color = '🔴'; klass = 'bg-red-100 text-red-800'; text = 'ไฟล์ใหญ่ - จะบีบอัดอัตโนมัติ'; }
-            else if (fileSize >= 500000) { color = '🟡'; klass = 'bg-yellow-100 text-yellow-800'; text = 'ไฟล์ปานกลาง'; }
-            status.innerHTML = `<div class="status-indicator ${klass} flex items-center space-x-3">
-                <span class="text-xl">${color}</span>
-                <div><div class="font-semibold">${(fileSize/1024/1024).toFixed(2)} MB</div>
-                <div class="text-sm">${text}</div></div></div>`;
-            if (file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.innerHTML = `<div class="flex justify-center"><img src="${e.target.result}" alt="ตัวอย่างรูปภาพ" class="image-preview w-40 h-40 object-cover"></div>`;
-                };
-                reader.readAsDataURL(file);
-            } else {
-                preview.innerHTML = `<div class="flex justify-center"><div class="w-40 h-40 bg-gray-100 rounded-lg border-2 border-gray-300 shadow-lg flex items-center justify-center"><i class="fas fa-file-pdf text-red-500 text-5xl"></i></div></div>`;
-            }
-        } else {
-            preview.innerHTML = ''; status.innerHTML = '';
-        }
-    }
-
-    // ========== ฟังก์ชัน clearForm ==========
-    function clearForm() {
-        Swal.fire({
-            title: 'ต้องการล้างข้อมูลทั้งหมด?',
-            text: 'ข้อมูลที่กรอกจะหายทั้งหมด',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ef4444',
-            cancelButtonColor: '#6b7280',
-            confirmButtonText: 'ใช่ ล้างข้อมูล',
-            cancelButtonText: 'ยกเลิก'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('staffForm').reset();
-                document.getElementById('personalImagePreview').innerHTML = '';
-                document.getElementById('personalImageStatus').innerHTML = '';
-                document.getElementById('licenseDocumentPreview').innerHTML = '';
-                document.getElementById('licenseDocumentStatus').innerHTML = '';
-                document.getElementById('educationDocumentPreview').innerHTML = '';
-                document.getElementById('educationDocumentStatus').innerHTML = '';
-                document.getElementById('specializedDocumentPreview').innerHTML = '';
-                document.getElementById('specializedDocumentStatus').innerHTML = '';
-                window.isUpdateMode = false;
-                window.hasSubmittedBefore = false;
-                window.currentData = null;
-                const submitButton = document.querySelector('button[type="submit"]');
-                submitButton.innerHTML = '<i class="fas fa-save mr-4 animate-bounce text-yellow-600 text-xl"></i>บันทึกข้อมูล';
-                submitButton.className = 'flex-1 btn-primary flex items-center justify-center';
-                document.getElementById('clearFormBtn').style.display = 'none';
-                Swal.fire({
-                    icon: 'success',
-                    title: 'ล้างข้อมูลเรียบร้อย!',
-                    text: 'พร้อมสำหรับการลงทะเบียนใหม่',
-                    confirmButtonText: 'ตกลง',
-                    confirmButtonColor: '#10b981'
-                });
-            }
-        });
-    }
-
-    // ========== ฟังก์ชัน editData ==========
-    function editData() {
-        if (window.currentData) {
-            const form = document.getElementById('staffForm');
-            Object.keys(window.currentData).forEach(key => {
-                const input = form.querySelector(`[name="${key}"]`);
-                if (input && window.currentData[key]) {
-                    input.value = window.currentData[key];
-                }
-            });
-            if (window.currentData.birthDate) calculateAge();
-            if (window.currentData.startWorkDate) calculateWorkExperience();
-            const submitButton = document.querySelector('button[type="submit"]');
-            submitButton.innerHTML = '<i class="fas fa-sync-alt mr-3 animate-spin text-yellow-600"></i>อัพเดทข้อมูล';
-            submitButton.className = 'flex-1 bg-gradient-to-r from-orange-300 to-red-300 hover:from-orange-400 hover:to-red-400 text-black font-semibold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center text-lg shadow-lg';
-            window.isUpdateMode = true;
-            closeModal();
-            document.getElementById('registrationForm').scrollIntoView({ behavior: 'smooth' });
-            Swal.fire({
-                icon: 'info',
-                title: 'โหมดแก้ไขข้อมูล',
-                text: 'ข้อมูลได้ถูกโหลดในฟอร์มแล้ว คุณสามารถแก้ไขและอัพเดทข้อมูลได้',
-                confirmButtonText: 'เข้าใจแล้ว',
-                confirmButtonColor: '#f8b4cb'
-            });
-        }
-    }
-
-    // ========== Modal functions ==========
-    function showDataModal(data) {
-        const modal = document.getElementById('dataModal');
-        const modalContent = document.getElementById('modalContent');
-        const fieldLabels = {
-            idCard: 'เลขบัตรประชาชน',
-            prefix: 'คำนำหน้า',
-            fullName: 'ชื่อ-นามสกุล',
-            birthDate: 'วันเกิด',
-            age: 'อายุ',
-            phone: 'เบอร์โทรศัพท์',
-            email: 'อีเมล',
-            department: 'หน่วยงาน',
-            position: 'ตำแหน่ง',
-            positionNumber: 'เลขที่ประจำตำแหน่ง',
-            positionLevel: 'ระดับตำแหน่ง',
-            positionType: 'ประเภทตำแหน่ง',
-            expertise: 'ด้านความชำนาญ',
-            licenseNumber: 'เลขใบประกอบวิชาชีพ',
-            nursingCouncilNumber: 'เลขที่สมาชิกสภาการพยาบาล',
-            licenseExpiry: 'วันหมดอายุใบประกอบวิชาชีพ',
-            startDate: 'วันที่เริ่มปฏิบัติงาน',
-            appointmentDate: 'วันที่บรรจุราชการ',
-            specialistDate: 'วันที่ดำรงตำแหน่งพยาบาลวิชาชีพชำนาญการ',
-            retirementYear: 'ปีที่เกษียณอายุราชการ',
-            education: 'ระดับการศึกษา',
-            bachelorField: 'วุฒิปริญญาตรี',
-            masterField: 'วุฒิปริญญาโท',
-            doctoralField: 'วุฒิปริญญาเอก',
-            specializedNursing: 'หลักสูตรการพยาบาลเฉพาะทาง',
-            workType: 'ประเภทการปฏิบัติงาน',
-            workExperience: 'อายุงาน'
+        // Configuration - ตรงกับโค้ด GS ของคุณ
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwettDCjvdFPKV4dk_Kl0zwzN7kIVfchsmKgIEAwcQNgWIZyrU6Ecb8RQrjyBx3IAg57A/exec';
+        const SHEET_ID = '1COt-ehxsy2b8B7zomUozR9Qpuo6j09rsGKSlaGABQro';
+        const SHEET_NAME = 'ชีต1';
+        const FOLDER_ID = '1TUm9g7DgHvy9sRsjuya-gK3D1TjqPgm_';
+        
+        let dropdownData = {
+            departments: [],
+            positions: [],
+            positionLevels: [],
+            positionTypes: [],
+            positionExpertise: [],
+            education: [],
+            workTypes: []
         };
-        let content = '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">';
-        Object.keys(fieldLabels).forEach(key => {
-            if (data[key] && data[key] !== '') {
-                content += `<div class="bg-white p-4 rounded-xl border-2 border-pink-200 shadow-sm">
-                    <div class="text-sm text-gray-600 font-semibold mb-1">${fieldLabels[key]}</div>
-                    <div class="text-gray-800 font-medium text-lg">${data[key]}</div>
-                </div>`;
-            }
-        });
-        content += '</div>';
-        modalContent.innerHTML = content;
-        modal.style.display = 'block';
-    }
-    function closeModal() {
-        document.getElementById('dataModal').style.display = 'none';
-    }
-    window.onclick = function(event) {
-        const modal = document.getElementById('dataModal');
-        if (event.target === modal) closeModal();
-    };
 
-    // ========== Auto-calculation functions ==========
-    function calculateAge() {
-        const birthDateInput = document.querySelector('input[name="birthDate"]');
-        const ageInput = document.querySelector('input[name="age"]');
-        const retirementYearInput = document.querySelector('input[name="retirementYear"]');
-        if (birthDateInput && ageInput && retirementYearInput && birthDateInput.value) {
-            const birthDate = new Date(birthDateInput.value);
-            const today = new Date();
-            let age = today.getFullYear() - birthDate.getFullYear();
-            const monthDiff = today.getMonth() - birthDate.getMonth();
-            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) age--;
-            ageInput.value = age;
-            retirementYearInput.value = birthDate.getFullYear() + 60;
-        }
-    }
-    function calculateWorkExperience() {
-        const startDateInput = document.querySelector('input[name="startDate"]');
-        const workExperienceInput = document.querySelector('input[name="workExperience"]');
-        if (startDateInput && workExperienceInput && startDateInput.value) {
-            const startDate = new Date(startDateInput.value);
-            const today = new Date();
-            let years = today.getFullYear() - startDate.getFullYear();
-            let months = today.getMonth() - startDate.getMonth();
-            if (months < 0) { years--; months += 12; }
-            if (today.getDate() < startDate.getDate()) { months--; if (months < 0) { years--; months += 12; } }
-            let experienceText = '';
-            if (years > 0) experienceText += years + ' ปี';
-            if (months > 0) experienceText += (experienceText ? ' ' : '') + months + ' เดือน';
-            if (!experienceText) experienceText = 'น้อยกว่า 1 เดือน';
-            workExperienceInput.value = experienceText;
-        }
-    }
-
-    // ========== Form submit ==========
-    document.getElementById('staffForm').addEventListener('submit', async function(e) {
-        e.preventDefault();
-        Swal.fire({
-            title: window.isUpdateMode ? 'กำลังอัพเดทข้อมูล...' : 'กำลังบันทึกข้อมูล...',
-            html: `<div class="flex flex-col items-center space-y-4"><div class="loading-spinner"></div></div>`,
-            allowOutsideClick: false, showConfirmButton: false,
-            didOpen: () => { Swal.showLoading(); }
-        });
-        try {
-            const form = this;
-            const originalFormData = new FormData(form);
-            // เตรียมข้อมูล
-            const personnelData = {
-                action: window.isUpdateMode ? 'update' : 'create',
-                originalIdCard: window.currentData?.idCard || originalFormData.get('idCard'),
-                idCard: originalFormData.get('idCard') || '',
-                department: originalFormData.get('department') || '',
-                positionId: originalFormData.get('positionNumber') || '',
-                prefix: originalFormData.get('prefix') || '',
-                fullName: originalFormData.get('fullName') || '',
-                position: originalFormData.get('position') || '',
-                positionLevel: originalFormData.get('positionLevel') || '',
-                positionType: originalFormData.get('positionType') || '',
-                positionExpertise: originalFormData.get('expertise') || '',
-                birthDate: originalFormData.get('birthDate') || '',
-                licenseNumber: originalFormData.get('licenseNumber') || '',
-                nursingCouncilNumber: originalFormData.get('nursingCouncilNumber') || '',
-                licenseExpiry: originalFormData.get('licenseExpiry') || '',
-                startWorkDate: originalFormData.get('startDate') || '',
-                appointmentDate: originalFormData.get('appointmentDate') || '',
-                specialistDate: originalFormData.get('specialistDate') || '',
-                retirementYear: originalFormData.get('retirementYear') || '',
-                phone: originalFormData.get('phone') || '',
-                email: originalFormData.get('email') || '',
-                education: originalFormData.get('educationLevel') || '',
-                bachelorDegree: originalFormData.get('bachelorField') || '',
-                masterDegree: originalFormData.get('masterField') || '',
-                doctoralDegree: originalFormData.get('doctoralField') || '',
-                specializedNursing: originalFormData.get('specializedNursing') || '',
-                workType: originalFormData.get('workType') || '',
-                age: originalFormData.get('age') || '',
-                workAge: originalFormData.get('workExperience') || '',
-                licenseExpiryDate: originalFormData.get('licenseExpiry') || ''
-            };
-            // สร้าง FormData สำหรับส่ง (แนบไฟล์)
-            const formData = new FormData();
-            Object.keys(personnelData).forEach(key => formData.append(key, personnelData[key]));
-            ['personalImage', 'licenseDocument', 'educationDocument', 'specializedDocument'].forEach(fieldName => {
-                const file = originalFormData.get(fieldName);
-                if (file && file.size > 0) formData.append(fieldName, file);
-            });
-
-            const response = await fetch(SCRIPT_URL, { method: 'POST', body: formData });
-            const responseText = await response.text();
-            let responseData = null;
-            let success = false;
-            try {
-                responseData = JSON.parse(responseText);
-                success = responseData.success === true;
-            } catch (parseError) {
-                success = response.ok && (responseText.includes('success') || responseText.includes('สำเร็จ'));
-            }
-            Swal.close();
-            if (success) {
-                window.currentData = personnelData;
-                await Swal.fire({
-                    icon: 'success',
-                    title: window.isUpdateMode ? 'อัพเดทข้อมูลสำเร็จ!' : 'บันทึกข้อมูลสำเร็จ!',
-                    text: 'ข้อมูลได้ถูกบันทึกเรียบร้อยแล้ว',
-                    confirmButtonText: 'ตกลง',
-                    confirmButtonColor: '#10b981',
-                    timer: 3000,
-                    timerProgressBar: true
-                });
-                if (!window.isUpdateMode) {
-                    window.hasSubmittedBefore = true;
-                    document.querySelector('button[type="submit"]').innerHTML = '<i class="fas fa-sync-alt mr-3 animate-spin text-yellow-600"></i>อัพเดทข้อมูล';
-                    document.querySelector('button[type="submit"]').className = 'flex-1 bg-gradient-to-r from-orange-300 to-red-300 hover:from-orange-400 hover:to-red-400 text-black font-semibold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center text-lg shadow-lg';
-                    document.getElementById('clearFormBtn').style.display = 'flex';
-                    window.isUpdateMode = true;
+        // Auto-calculation functions
+        function calculateAge() {
+            const birthDateInput = document.querySelector('input[name="birthDate"]');
+            const ageInput = document.querySelector('input[name="age"]');
+            const retirementYearInput = document.querySelector('input[name="retirementYear"]');
+            
+            if (birthDateInput.value) {
+                const birthDate = new Date(birthDateInput.value);
+                const today = new Date();
+                let age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                
+                if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    age--;
                 }
-            } else {
+                
+                ageInput.value = age;
+                
+                // Calculate retirement year (birth year + 60)
+                const retirementYear = birthDate.getFullYear() + 60;
+                retirementYearInput.value = retirementYear;
+            }
+        }
+
+        function calculateWorkExperience() {
+            const startDateInput = document.querySelector('input[name="startDate"]');
+            const workExperienceInput = document.querySelector('input[name="workExperience"]');
+            
+            if (startDateInput.value) {
+                const startDate = new Date(startDateInput.value);
+                const today = new Date();
+                
+                let years = today.getFullYear() - startDate.getFullYear();
+                let months = today.getMonth() - startDate.getMonth();
+                
+                if (months < 0) {
+                    years--;
+                    months += 12;
+                }
+                
+                if (today.getDate() < startDate.getDate()) {
+                    months--;
+                    if (months < 0) {
+                        years--;
+                        months += 12;
+                    }
+                }
+                
+                let experienceText = '';
+                if (years > 0) {
+                    experienceText += years + ' ปี';
+                }
+                if (months > 0) {
+                    if (experienceText) experienceText += ' ';
+                    experienceText += months + ' เดือน';
+                }
+                if (!experienceText) {
+                    experienceText = 'น้อยกว่า 1 เดือน';
+                }
+                
+                workExperienceInput.value = experienceText;
+            }
+        }
+
+        // Enhanced image compression for mobile performance
+        function compressImage(file, maxWidth = 600, maxHeight = 450, quality = 0.7) {
+            return new Promise((resolve) => {
+                // Mobile-optimized compression settings
+                const isMobile = window.innerWidth <= 768;
+                const finalMaxWidth = isMobile ? Math.min(maxWidth, 400) : maxWidth;
+                const finalMaxHeight = isMobile ? Math.min(maxHeight, 300) : maxHeight;
+                const finalQuality = isMobile ? Math.min(quality, 0.6) : quality;
+                
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                
+                img.onload = function() {
+                    let { width, height } = img;
+                    
+                    // Calculate new dimensions
+                    const aspectRatio = width / height;
+                    
+                    if (width > height) {
+                        if (width > finalMaxWidth) {
+                            width = finalMaxWidth;
+                            height = width / aspectRatio;
+                        }
+                    } else {
+                        if (height > finalMaxHeight) {
+                            height = finalMaxHeight;
+                            width = height * aspectRatio;
+                        }
+                    }
+                    
+                    // Ensure dimensions don't exceed limits
+                    if (width > finalMaxWidth) {
+                        width = finalMaxWidth;
+                        height = width / aspectRatio;
+                    }
+                    if (height > finalMaxHeight) {
+                        height = finalMaxHeight;
+                        width = height * aspectRatio;
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    // Use better image smoothing for mobile
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = isMobile ? 'medium' : 'high';
+                    
+                    ctx.drawImage(img, 0, 0, width, height);
+                    
+                    // Use webp for better compression on supported browsers
+                    const outputFormat = 'image/jpeg'; // Keep JPEG for compatibility
+                    canvas.toBlob(resolve, outputFormat, finalQuality);
+                };
+                
+                img.src = URL.createObjectURL(file);
+            });
+        }
+        
+        // Fast image validation
+        function validateImageFile(file) {
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            
+            if (!validTypes.includes(file.type)) {
+                throw new Error('รองรับเฉพาะไฟล์ JPG, PNG, GIF, WebP เท่านั้น');
+            }
+            
+            if (file.size > maxSize) {
+                throw new Error('ขนาดไฟล์ต้องไม่เกิน 10MB');
+            }
+            
+            return true;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function getFileSizeStatus(size) {
+            if (size < 500000) return { color: '🟢', text: 'ไฟล์ขนาดเหมาะสม', class: 'bg-green-100 text-green-800' };
+            if (size < 1000000) return { color: '🟡', text: 'ไฟล์ปานกลาง - อาจบีบอัดเล็กน้อย', class: 'bg-yellow-100 text-yellow-800' };
+            return { color: '🔴', text: 'ไฟล์ใหญ่ - จะบีบอัดอัตโนมัติ', class: 'bg-red-100 text-red-800' };
+        }
+
+        // Enhanced dropdown loading with caching and mobile optimization
+        async function loadDropdownData() {
+            try {
+                // Check if data is cached
+                const cachedData = localStorage.getItem('dropdownData');
+                const cacheTime = localStorage.getItem('dropdownDataTime');
+                const now = Date.now();
+                
+                // Use cached data if less than 5 minutes old
+                if (cachedData && cacheTime && (now - parseInt(cacheTime)) < 300000) {
+                    console.log('📱 Using cached dropdown data');
+                    dropdownData = JSON.parse(cachedData);
+                    populateDropdowns();
+                    return;
+                }
+                
+                console.log('📱 Loading fresh dropdown data...');
+                
+                // Mobile-optimized fetch with timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+                
+                const response = await fetch(SCRIPT_URL + '?action=getDropdownData', {
+                    method: 'GET',
+                    signal: controller.signal
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        dropdownData = data.data;
+                        
+                        // Cache the data
+                        localStorage.setItem('dropdownData', JSON.stringify(dropdownData));
+                        localStorage.setItem('dropdownDataTime', now.toString());
+                        
+                        console.log('📱 Dropdown data loaded and cached');
+                    }
+                }
+                
+                populateDropdowns();
+                
+            } catch (error) {
+                console.error('Error loading dropdown data:', error);
+                
+                // Try to use cached data even if expired
+                const cachedData = localStorage.getItem('dropdownData');
+                if (cachedData) {
+                    console.log('📱 Using expired cached data as fallback');
+                    dropdownData = JSON.parse(cachedData);
+                }
+                
+                populateDropdowns();
+            }
+        }
+        
+        // Clear cache function
+        function clearDropdownCache() {
+            localStorage.removeItem('dropdownData');
+            localStorage.removeItem('dropdownDataTime');
+            console.log('📱 Dropdown cache cleared');
+        }
+
+        function populateDropdowns() {
+            // Populate department dropdown
+            const departmentSelect = document.querySelector('select[name="department"]');
+            if (departmentSelect) {
+                departmentSelect.innerHTML = '<option value="">เลือกหน่วยงาน</option>';
+                
+                // Add predefined departments with proper sorting
+                const predefinedDepartments = [
+                    'หอผู้ป่วยแยกโรค 7/2',
+                    'หอผู้ป่วยแยกโรค 7/3',
+                    'หอผู้ป่วยแยกโรค 7/4',
+                    'หอผู้ป่วยแยกโรค 7/5'
+                ];
+                
+                // Add predefined departments first
+                predefinedDepartments.forEach(dept => {
+                    departmentSelect.innerHTML += `<option value="${dept}">${dept}</option>`;
+                });
+                
+                // Add departments from data if available
+                if (dropdownData.departments && dropdownData.departments.length > 0) {
+                    const uniqueDepartments = [...new Set(dropdownData.departments.filter(dept => 
+                        dept && !predefinedDepartments.includes(dept)
+                    ))];
+                    
+                    // Sort remaining departments
+                    uniqueDepartments.sort();
+                    
+                    uniqueDepartments.forEach(dept => {
+                        departmentSelect.innerHTML += `<option value="${dept}">${dept}</option>`;
+                    });
+                }
+            }
+
+            // Populate position dropdown
+            const positionSelect = document.querySelector('select[name="position"]');
+            if (positionSelect) {
+                positionSelect.innerHTML = '<option value="">เลือกตำแหน่ง</option>';
+                if (dropdownData.positions && dropdownData.positions.length > 0) {
+                    const uniquePositions = [...new Set(dropdownData.positions.filter(pos => pos))];
+                    uniquePositions.forEach(pos => {
+                        positionSelect.innerHTML += `<option value="${pos}">${pos}</option>`;
+                    });
+                }
+            }
+
+            // Populate position level dropdown
+            const positionLevelSelect = document.querySelector('select[name="positionLevel"]');
+            if (positionLevelSelect) {
+                positionLevelSelect.innerHTML = '<option value="">เลือกระดับตำแหน่ง</option>';
+                if (dropdownData.positionLevels && dropdownData.positionLevels.length > 0) {
+                    const filteredLevels = dropdownData.positionLevels.filter(level => 
+                        level && 
+                        level !== 'ชำนาญการพิเศษ' && 
+                        level !== 'ผู้ช่วยพยาบาล'
+                    );
+                    const uniqueLevels = [...new Set(filteredLevels)];
+                    uniqueLevels.forEach(level => {
+                        positionLevelSelect.innerHTML += `<option value="${level}">${level}</option>`;
+                    });
+                }
+                positionLevelSelect.innerHTML += `<option value="ระดับเชี่ยวชาญ">ระดับเชี่ยวชาญ</option>`;
+            }
+
+            // Populate position type dropdown
+            const positionTypeSelect = document.querySelector('select[name="positionType"]');
+            if (positionTypeSelect) {
+                positionTypeSelect.innerHTML = '<option value="">เลือกประเภทตำแหน่ง</option>';
+                if (dropdownData.positionTypes && dropdownData.positionTypes.length > 0) {
+                    const filteredTypes = dropdownData.positionTypes.filter(type => 
+                        type && type !== 'ผู้ช่วยพยาบาล'
+                    );
+                    const uniqueTypes = [...new Set(filteredTypes)];
+                    uniqueTypes.forEach(type => {
+                        positionTypeSelect.innerHTML += `<option value="${type}">${type}</option>`;
+                    });
+                }
+            }
+
+            // Populate expertise dropdown
+            const expertiseSelect = document.querySelector('select[name="expertise"]');
+            if (expertiseSelect) {
+                expertiseSelect.innerHTML = '<option value="">เลือกด้านความชำนาญ</option>';
+                if (dropdownData.positionExpertise && dropdownData.positionExpertise.length > 0) {
+                    const filteredExpertise = dropdownData.positionExpertise.filter(exp => 
+                        exp && exp !== 'อบัติเหตุและฉุกเฉิน'
+                    );
+                    const uniqueExpertise = [...new Set(filteredExpertise)];
+                    uniqueExpertise.forEach(exp => {
+                        expertiseSelect.innerHTML += `<option value="${exp}">${exp}</option>`;
+                    });
+                }
+            }
+
+            // Populate education level dropdown
+            const educationSelect = document.querySelector('select[name="educationLevel"]');
+            if (educationSelect) {
+                educationSelect.innerHTML = '<option value="">เลือกระดับการศึกษา</option>';
+                if (dropdownData.education && dropdownData.education.length > 0) {
+                    const uniqueEducation = [...new Set(dropdownData.education.filter(edu => edu))];
+                    uniqueEducation.forEach(edu => {
+                        educationSelect.innerHTML += `<option value="${edu}">${edu}</option>`;
+                    });
+                }
+            }
+        }
+
+        // Enhanced mobile-optimized image upload function
+        async function handleImageUpload(file) {
+            if (!file) return '';
+            
+            try {
+                // Validate file first
+                validateImageFile(file);
+                
+                const originalSize = file.size;
+                let compressedFile = file;
+                
+                // Mobile-optimized compression thresholds
+                const isMobile = window.innerWidth <= 768;
+                const compressionThreshold = isMobile ? 300000 : 800000; // 300KB for mobile, 800KB for desktop
+                const maxFinalSize = isMobile ? 500000 : 1500000; // 500KB for mobile, 1.5MB for desktop
+                
+                // Compress if file is too large
+                if (file.size > compressionThreshold) {
+                    const maxWidth = isMobile ? 400 : 800;
+                    const maxHeight = isMobile ? 300 : 600;
+                    const quality = isMobile ? 0.6 : 0.7;
+                    
+                    compressedFile = await compressImage(file, maxWidth, maxHeight, quality);
+                    
+                    // If still too large, compress more aggressively
+                    if (compressedFile.size > maxFinalSize) {
+                        const aggressiveWidth = isMobile ? 300 : 600;
+                        const aggressiveHeight = isMobile ? 225 : 450;
+                        const aggressiveQuality = isMobile ? 0.4 : 0.5;
+                        
+                        compressedFile = await compressImage(file, aggressiveWidth, aggressiveHeight, aggressiveQuality);
+                    }
+                }
+                
+                // Convert to base64 with proper MIME type matching GS format
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const result = e.target.result;
+                        
+                        // Validate base64 format to match GS expectations
+                        if (!result || !result.includes('data:') || !result.includes(',')) {
+                            reject(new Error('รูปแบบ base64 ไม่ถูกต้อง'));
+                            return;
+                        }
+                        
+                        // Use regex matching exactly like GS code
+                        const matches = result.match(/^data:([^;]+);base64,(.+)$/);
+                        if (!matches) {
+                            reject(new Error('ไม่สามารถแยก MIME type ได้'));
+                            return;
+                        }
+                        
+                        const mimeType = matches[1];
+                        const base64Content = matches[2];
+                        
+                        // Validate MIME type
+                        const validMimeTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                        if (!validMimeTypes.includes(mimeType)) {
+                            reject(new Error('รูปแบบไฟล์ไม่รองรับ: ' + mimeType));
+                            return;
+                        }
+                        
+                        // Validate base64 content
+                        if (!base64Content || base64Content.length === 0) {
+                            reject(new Error('ข้อมูลรูปภาพว่างเปล่า'));
+                            return;
+                        }
+                        
+                        // Check final size for mobile optimization
+                        const finalSizeEstimate = (base64Content.length * 3) / 4; // Rough base64 to bytes conversion
+                        
+                        console.log(`📱 Image processed (Mobile: ${isMobile}):`, {
+                            mimeType,
+                            originalSize: formatFileSize(originalSize),
+                            compressedSize: formatFileSize(compressedFile.size),
+                            base64Length: base64Content.length,
+                            estimatedFinalSize: formatFileSize(finalSizeEstimate)
+                        });
+                        
+                        resolve(result);
+                    };
+                    
+                    reader.onerror = () => reject(new Error('ไม่สามารถอ่านไฟล์ได้'));
+                    reader.readAsDataURL(compressedFile);
+                });
+                
+            } catch (error) {
+                console.error('Image upload error:', error);
+                throw error;
+            }
+        }
+
+        // Helper function to generate filename for image upload
+        function generateImageFilename(fieldName, originalName) {
+            const timestamp = Date.now();
+            const extension = originalName ? originalName.split('.').pop() : 'jpg';
+            return `${fieldName}_${timestamp}.${extension}`;
+        }
+
+        // Enhanced form submission compatible with GS handleUpdatePersonnel
+        document.getElementById('staffForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const isUpdate = window.isUpdateMode || false;
+            
+            // Show simple loading alert
+            Swal.fire({
+                title: isUpdate ? 'กำลังอัพเดทข้อมูล...' : 'กำลังบันทึกข้อมูล...',
+                html: `
+                    <div class="flex flex-col items-center space-y-4">
+                        <div class="loading-spinner"></div>
+                    </div>
+                `,
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            try {
+                const originalFormData = new FormData(this);
+                
+                // Handle image uploads with progress tracking
+                const imageFields = ['personalImage', 'licenseDocument', 'educationDocument', 'specializedDocument'];
+                let imageCount = 0;
+                let processedImages = 0;
+                
+                // Count total images to process
+                for (const fieldName of imageFields) {
+                    const imageFile = originalFormData.get(fieldName);
+                    if (imageFile && imageFile.size > 0) {
+                        imageCount++;
+                    }
+                }
+                
+                // Update progress (simplified)
+                const updateProgress = (message) => {
+                    // Progress updates removed for cleaner UI
+                };
+                
+                // Prepare data object for GS handleUpdatePersonnel format
+                const personnelData = {
+                    action: isUpdate ? 'updatePersonnel' : 'addPersonnel',
+                    originalIdCard: window.currentData?.idCard || originalFormData.get('idCard'),
+                    idCard: originalFormData.get('idCard') || '',
+                    department: originalFormData.get('department') || '',
+                    positionId: originalFormData.get('positionNumber') || '',
+                    prefix: originalFormData.get('prefix') || '',
+                    fullName: originalFormData.get('fullName') || '',
+                    position: originalFormData.get('position') || '',
+                    positionLevel: originalFormData.get('positionLevel') || '',
+                    positionType: originalFormData.get('positionType') || '',
+                    positionExpertise: originalFormData.get('expertise') || '',
+                    birthDate: originalFormData.get('birthDate') || '',
+                    licenseNumber: originalFormData.get('licenseNumber') || '',
+                    nursingCouncilNumber: originalFormData.get('nursingCouncilNumber') || '',
+                    licenseExpiry: originalFormData.get('licenseExpiry') || '',
+                    startWorkDate: originalFormData.get('startDate') || '',
+                    appointmentDate: originalFormData.get('appointmentDate') || '',
+                    specialistDate: originalFormData.get('specialistDate') || '',
+                    retirementYear: originalFormData.get('retirementYear') || '',
+                    phone: originalFormData.get('phone') || '',
+                    email: originalFormData.get('email') || '',
+                    education: originalFormData.get('educationLevel') || '',
+                    bachelorDegree: originalFormData.get('bachelorField') || '',
+                    masterDegree: originalFormData.get('masterField') || '',
+                    doctoralDegree: originalFormData.get('doctoralField') || '',
+                    specializedNursing: originalFormData.get('specializedNursing') || '',
+                    workType: originalFormData.get('workType') || '',
+                    age: originalFormData.get('age') || '',
+                    workAge: originalFormData.get('workExperience') || '',
+                    licenseExpiryDate: originalFormData.get('licenseExpiry') || ''
+                };
+                
+                // Process images
+                for (const fieldName of imageFields) {
+                    const imageFile = originalFormData.get(fieldName);
+                    if (imageFile && imageFile.size > 0) {
+                        try {
+                            // Process image with proper base64 encoding for GS
+                            const imageData = await handleImageUpload(imageFile);
+                            
+                            // Add image data to personnel data object
+                            personnelData[fieldName] = imageData;
+                            personnelData[fieldName + '_filename'] = generateImageFilename(fieldName, imageFile.name);
+                            
+                            processedImages++;
+                            
+                            console.log(`Image ${fieldName} prepared for GS:`, {
+                                filename: personnelData[fieldName + '_filename'],
+                                dataLength: imageData.length,
+                                mimeType: imageData.split(',')[0]
+                            });
+                            
+                        } catch (imageError) {
+                            console.error(`Error processing ${fieldName}:`, imageError);
+                            
+                            // Show specific error for image processing
+                            Swal.close();
+                            await Swal.fire({
+                                icon: 'error',
+                                title: 'ข้อผิดพลาดในการประมวลผลรูปภาพ',
+                                html: `
+                                    <div class="text-lg">
+                                        <p class="mb-2">❌ ไม่สามารถประมวลผลรูปภาพได้: <strong>${fieldName}</strong></p>
+                                        <p class="text-red-600 font-semibold">กรุณาตรวจสอบไฟล์รูปภาพและลองใหม่</p>
+                                        <p class="text-sm text-gray-600 mt-2">ข้อผิดพลาด: ${imageError.message}</p>
+                                        <div class="mt-3 p-3 bg-blue-50 rounded-lg">
+                                            <p class="text-sm text-blue-800">
+                                                <strong>คำแนะนำ:</strong><br>
+                                                • ใช้ไฟล์รูปภาพ JPG, PNG, GIF หรือ WebP<br>
+                                                • ขนาดไฟล์ไม่เกิน 5MB<br>
+                                                • ตรวจสอบว่าไฟล์ไม่เสียหาย<br>
+                                                • รูปภาพต้องเป็นรูปแบบที่ถูกต้อง
+                                            </p>
+                                        </div>
+                                    </div>
+                                `,
+                                confirmButtonText: 'ตกลง',
+                                confirmButtonColor: '#ef4444'
+                            });
+                            return; // Stop processing
+                        }
+                    }
+                }
+
+                // Send data to Google Sheets
+                console.log('=== Sending Personnel Data to Google Apps Script ===');
+                console.log('Action:', personnelData.action);
+                console.log('ID Card:', personnelData.idCard);
+                console.log('Full Name:', personnelData.fullName);
+                console.log('Images:', imageFields.filter(field => personnelData[field]).length);
+                console.log('=== End Data Debug ===');
+                
+                // Convert data to FormData for POST
+                const formData = new FormData();
+                Object.keys(personnelData).forEach(key => {
+                    if (personnelData[key] !== null && personnelData[key] !== undefined) {
+                        formData.append(key, personnelData[key]);
+                    }
+                });
+                
+                // Send data to Google Apps Script
+                let responseData = null;
+                let success = false;
+                
+                try {
+                    const response = await fetch(SCRIPT_URL, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const responseText = await response.text();
+                    console.log('POST Response:', responseText);
+                    
+                    if (responseText.trim()) {
+                        try {
+                            responseData = JSON.parse(responseText);
+                            success = responseData.success === true;
+                        } catch (parseError) {
+                            console.log('Could not parse POST response as JSON:', parseError);
+                            // If response is OK but not JSON, consider it success for simple responses
+                            if (response.ok && (responseText.includes('success') || responseText.includes('สำเร็จ'))) {
+                                success = true;
+                                responseData = { success: true, message: 'บันทึกข้อมูลสำเร็จ' };
+                            }
+                        }
+                    }
+                } catch (postError) {
+                    console.error('POST failed:', postError);
+                    throw new Error(`การส่งข้อมูลล้มเหลว: ${postError.message}`);
+                }
+                
+                Swal.close();
+                
+                if (success && responseData && responseData.success) {
+                    // Store data for editing
+                    window.currentData = personnelData;
+                    
+                    // Count successful image uploads
+                    const uploadedImages = imageFields.filter(field => personnelData[field]).length;
+                    
+                    // Show simple success message
+                    await Swal.fire({
+                        icon: 'success',
+                        title: isUpdate ? 'อัพเดทข้อมูลสำเร็จ!' : 'บันทึกข้อมูลสำเร็จ!',
+                        text: 'ข้อมูลได้ถูกบันทึกเรียบร้อยแล้ว',
+                        confirmButtonText: 'ตกลง',
+                        confirmButtonColor: '#10b981',
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
+                    
+                    if (!isUpdate) {
+                        // Mark that we have submitted before
+                        window.hasSubmittedBefore = true;
+                        
+                        // Change button to update mode
+                        const submitButton = document.querySelector('button[type="submit"]');
+                        submitButton.innerHTML = '<i class="fas fa-sync-alt mr-3 animate-spin text-yellow-600"></i>อัพเดทข้อมูล';
+                        submitButton.className = 'flex-1 bg-gradient-to-r from-orange-300 to-red-300 hover:from-orange-400 hover:to-red-400 text-black font-semibold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center text-lg shadow-lg';
+                        
+                        // Show clear form button
+                        const clearButton = document.getElementById('clearFormBtn');
+                        clearButton.style.display = 'flex';
+                        
+                        // Set to update mode
+                        window.isUpdateMode = true;
+                    }
+                } else {
+                    // Show error message
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'ส่งข้อมูลไม่สำเร็จ',
+                        html: `
+                            <div class="text-lg">
+                                <p class="mb-2">❌ ไม่สามารถบันทึกข้อมูลได้</p>
+                                <p class="text-red-600 font-semibold">กรุณาลองใหม่อีกครั้ง</p>
+                                ${responseData && responseData.message ? `<p class="text-sm text-gray-600 mt-2">ข้อผิดพลาด: ${responseData.message}</p>` : ''}
+                            </div>
+                        `,
+                        confirmButtonText: 'ตกลง',
+                        confirmButtonColor: '#ef4444'
+                    });
+                }
+                
+            } catch (error) {
+                console.error('Form submission failed:', error);
+                
+                Swal.close();
+                
                 await Swal.fire({
                     icon: 'error',
-                    title: 'ส่งข้อมูลไม่สำเร็จ',
-                    html: `<div class="text-lg"><p class="mb-2">❌ ไม่สามารถบันทึกข้อมูลได้</p><p class="text-red-600 font-semibold">กรุณาลองใหม่อีกครั้ง</p>${responseData && responseData.message ? `<p class="text-sm text-gray-600 mt-2">ข้อผิดพลาด: ${responseData.message}</p>` : ''}</div>`,
+                    title: 'เกิดข้อผิดพลาด',
+                    html: `
+                        <div class="text-lg">
+                            <p class="mb-2">❌ ไม่สามารถส่งข้อมูลได้</p>
+                            <p class="text-red-600 font-semibold">กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตและลองใหม่</p>
+                            <p class="text-sm text-gray-600 mt-2">ข้อผิดพลาด: ${error.message}</p>
+                        </div>
+                    `,
                     confirmButtonText: 'ตกลง',
                     confirmButtonColor: '#ef4444'
                 });
             }
-        } catch (error) {
-            Swal.close();
-            await Swal.fire({
-                icon: 'error',
-                title: 'เกิดข้อผิดพลาด',
-                html: `<div class="text-lg"><p class="mb-2">❌ ไม่สามารถส่งข้อมูลได้</p><p class="text-red-600 font-semibold">กรุณาตรวจสอบการเชื่อมต่ออินเทอร์เน็ตและลองใหม่</p><p class="text-sm text-gray-600 mt-2">ข้อผิดพลาด: ${error.message}</p></div>`,
-                confirmButtonText: 'ตกลง',
-                confirmButtonColor: '#ef4444'
+        });
+
+        // Enhanced image preview function
+        function previewImage(input, previewId, statusId) {
+            const preview = document.getElementById(previewId);
+            const status = document.getElementById(statusId);
+            
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const fileSize = file.size;
+                const sizeStatus = getFileSizeStatus(fileSize);
+                
+                // Show file info with enhanced styling
+                status.innerHTML = `
+                    <div class="status-indicator ${sizeStatus.class} flex items-center space-x-3">
+                        <span class="text-xl">${sizeStatus.color}</span>
+                        <div>
+                            <div class="font-semibold">${formatFileSize(fileSize)}</div>
+                            <div class="text-sm">${sizeStatus.text}</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Show preview for images
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.innerHTML = `
+                            <div class="flex justify-center">
+                                <img src="${e.target.result}" alt="ตัวอย่างรูปภาพ" class="image-preview w-40 h-40 object-cover">
+                            </div>
+                        `;
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    // Show file icon for non-images
+                    preview.innerHTML = `
+                        <div class="flex justify-center">
+                            <div class="w-40 h-40 bg-gray-100 rounded-lg border-2 border-gray-300 shadow-lg flex items-center justify-center">
+                                <i class="fas fa-file-pdf text-red-500 text-5xl"></i>
+                            </div>
+                        </div>
+                    `;
+                }
+            } else {
+                preview.innerHTML = '';
+                status.innerHTML = '';
+            }
+        }
+
+        // Modal functions
+        function showDataModal(data) {
+            const modal = document.getElementById('dataModal');
+            const modalContent = document.getElementById('modalContent');
+            
+            const fieldLabels = {
+                idCard: 'เลขบัตรประชาชน',
+                prefix: 'คำนำหน้า',
+                fullName: 'ชื่อ-นามสกุล',
+                birthDate: 'วันเกิด',
+                age: 'อายุ',
+                phone: 'เบอร์โทรศัพท์',
+                email: 'อีเมล',
+                department: 'หน่วยงาน',
+                position: 'ตำแหน่ง',
+                positionNumber: 'เลขที่ประจำตำแหน่ง',
+                positionLevel: 'ระดับตำแหน่ง',
+                positionType: 'ประเภทตำแหน่ง',
+                expertise: 'ด้านความชำนาญ',
+                licenseNumber: 'เลขใบประกอบวิชาชีพ',
+                nursingCouncilNumber: 'เลขที่สมาชิกสภาการพยาบาล',
+                licenseExpiry: 'วันหมดอายุใบประกอบวิชาชีพ',
+                startDate: 'วันที่เริ่มปฏิบัติงาน',
+                appointmentDate: 'วันที่บรรจุราชการ',
+                specialistDate: 'วันที่ดำรงตำแหน่งพยาบาลวิชาชีพชำนาญการ',
+                retirementYear: 'ปีที่เกษียณอายุราชการ',
+                education: 'ระดับการศึกษา',
+                bachelorField: 'วุฒิปริญญาตรี',
+                masterField: 'วุฒิปริญญาโท',
+                doctoralField: 'วุฒิปริญญาเอก',
+                specializedNursing: 'หลักสูตรการพยาบาลเฉพาะทาง',
+                workType: 'ประเภทการปฏิบัติงาน',
+                workExperience: 'อายุงาน'
+            };
+            
+            let content = '<div class="grid grid-cols-1 md:grid-cols-2 gap-6">';
+            
+            Object.keys(fieldLabels).forEach(key => {
+                if (data[key] && data[key] !== '') {
+                    content += `
+                        <div class="bg-white p-4 rounded-xl border-2 border-pink-200 shadow-sm">
+                            <div class="text-sm text-gray-600 font-semibold mb-1">${fieldLabels[key]}</div>
+                            <div class="text-gray-800 font-medium text-lg">${data[key]}</div>
+                        </div>
+                    `;
+                }
+            });
+            
+            content += '</div>';
+            modalContent.innerHTML = content;
+            modal.style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('dataModal').style.display = 'none';
+        }
+        
+        function editData() {
+            if (window.currentData) {
+                const form = document.getElementById('staffForm');
+                Object.keys(window.currentData).forEach(key => {
+                    const input = form.querySelector(`[name="${key}"]`);
+                    if (input && window.currentData[key]) {
+                        input.value = window.currentData[key];
+                    }
+                });
+                
+                if (window.currentData.birthDate) {
+                    calculateAge();
+                }
+                
+                if (window.currentData.startWorkDate) {
+                    calculateWorkExperience();
+                }
+                
+                // Change submit button to update mode
+                const submitButton = document.querySelector('button[type="submit"]');
+                submitButton.innerHTML = '<i class="fas fa-sync-alt mr-3 animate-spin text-yellow-600"></i>อัพเดทข้อมูล';
+                submitButton.className = 'flex-1 bg-gradient-to-r from-orange-300 to-red-300 hover:from-orange-400 hover:to-red-400 text-black font-semibold py-4 px-6 rounded-lg transition-all duration-300 flex items-center justify-center text-lg shadow-lg';
+                
+                // Set form to update mode
+                window.isUpdateMode = true;
+                
+                closeModal();
+                
+                // Scroll to top of form
+                document.getElementById('registrationForm').scrollIntoView({ 
+                    behavior: 'smooth' 
+                });
+                
+                Swal.fire({
+                    icon: 'info',
+                    title: 'โหมดแก้ไขข้อมูล',
+                    text: 'ข้อมูลได้ถูกโหลดในฟอร์มแล้ว คุณสามารถแก้ไขและอัพเดทข้อมูลได้',
+                    confirmButtonText: 'เข้าใจแล้ว',
+                    confirmButtonColor: '#f8b4cb'
+                });
+            }
+        }
+        
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('dataModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+
+        // Clear form function
+        function clearForm() {
+            Swal.fire({
+                title: 'ต้องการล้างข้อมูลทั้งหมด?',
+                text: 'ข้อมูลที่กรอกจะหายทั้งหมด',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'ใช่ ล้างข้อมูล',
+                cancelButtonText: 'ยกเลิก'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Reset form
+                    document.getElementById('staffForm').reset();
+                    
+                    // Clear all image previews
+                    document.getElementById('personalImagePreview').innerHTML = '';
+                    document.getElementById('personalImageStatus').innerHTML = '';
+                    document.getElementById('licenseDocumentPreview').innerHTML = '';
+                    document.getElementById('licenseDocumentStatus').innerHTML = '';
+                    document.getElementById('educationDocumentPreview').innerHTML = '';
+                    document.getElementById('educationDocumentStatus').innerHTML = '';
+                    document.getElementById('specializedDocumentPreview').innerHTML = '';
+                    document.getElementById('specializedDocumentStatus').innerHTML = '';
+                    
+                    // Reset to create mode
+                    window.isUpdateMode = false;
+                    window.hasSubmittedBefore = false;
+                    window.currentData = null;
+                    
+                    // Reset submit button
+                    const submitButton = document.querySelector('button[type="submit"]');
+                    submitButton.innerHTML = '<i class="fas fa-save mr-4 animate-bounce text-yellow-600 text-xl"></i>บันทึกข้อมูล';
+                    submitButton.className = 'flex-1 btn-primary flex items-center justify-center';
+                    
+                    // Hide clear button
+                    document.getElementById('clearFormBtn').style.display = 'none';
+                    
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'ล้างข้อมูลเรียบร้อย!',
+                        text: 'พร้อมสำหรับการลงทะเบียนใหม่',
+                        confirmButtonText: 'ตกลง',
+                        confirmButtonColor: '#10b981'
+                    });
+                }
             });
         }
-    });
 
-    // ========== เรียก dropdown หลังโหลดหน้าจอ ==========
-    document.addEventListener('DOMContentLoaded', function() {
-        loadDropdownData();
-    });
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDropdownData();
+        });
+    </script>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'983f79bb85cb2dd4',t:'MTc1ODY4NzQ4Mi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
